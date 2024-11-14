@@ -15,7 +15,7 @@ export async function cli() {
     // prompt for component name
     console.log('Please provide a component name:');
     // read from stdin
-    let componentName = await new Promise((resolve) => {
+    componentName = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
         resolve(data.toString().trim());
       });

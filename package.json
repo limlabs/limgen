@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=22.11.0"
+  },
   "scripts": {
-    "test": "tsx --test ./test/*.ts"
+    "test": "tsx --test --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts"
   },
   "keywords": [],
   "author": "Liminal Labs",
