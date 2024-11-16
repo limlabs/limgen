@@ -1,4 +1,12 @@
 import fs from 'fs/promises';
+import { fullstackFargateProject, FullstackFargateProjectOptions } from './projects/fullstack-fargate';
+import { generateProjectYaml } from './projects/utils';
+
+export async function generateIndexFile(opts: FullstackFargateProjectOptions) {
+  const result = await fullstackFargateProject(opts);
+
+  await fs.writeFile('infrastructure/index.ts', result);
+}
 
 /**
  * 1. Creates a new directory if not exists called infrastructure
@@ -21,15 +29,59 @@ export async function cli() {
       });
     });
   }
+
+  // Check if pulumi exists as a command
+  try {
+    const { exec } = require('child_process');
+    await new Promise((resolve, reject) => {
+      exec('pulumi version', (error: unknown) => {
+        if (error) {
+          reject(new Error('Pulumi CLI not found. Please install Pulumi CLI and try again.'));
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  } catch (e) {
+    console.error('Pulumi CLI not found. Please install Pulumi CLI and try again.');
+    process.exit(1);
+  }
+
+  // Check if pulumi is logged in
   
   // create infrastructure directory
   // create components directory
   await fs.mkdir('infrastructure/components', { recursive: true });
 
+  // copy src/components/{componentName}.ts to $cwd/infrastructure/components/{componentName}.ts
+  await fs.cp(`${__dirname}/components`, 'infrastructure/components', { recursive: true });
 
-  // copy src/install/components/{componentName}.ts to $cwd/infrastructure/components/{componentName}.ts
-  await fs.copyFile(`${__dirname}/install/components/${componentName}.ts`, `infrastructure/components/${componentName}.ts`);
+  // generate the index.ts file
+  await generateIndexFile({ includeDb: false, includeStorage: false });
 
-  // copy install/infrastructure/index.ts 
-  await fs.copyFile(`${__dirname}/install/index.ts`, `infrastructure/index.ts`);
+  // generate the Pulumi.yaml file
+  await generateProjectYaml({ projectName: componentName });
+
+  // check if infrastructure/package.json exists
+  try {
+    await fs.stat('infrastructure/package.json');
+  } catch (e) {
+    // if it doesn't exist, create it
+    await fs.writeFile('infrastructure/package.json', JSON.stringify({ name: 'infrastructure', version: '1.0.0' }, null, 2));
+  }
+
+  // update the package.json to include @pulumi/pulumi, @pulumi/aws, @pulumi/awsx, and @pulumi/random
+  // (eventually we will load these from the file imports in the components that are copied over)
+  const packageJSON = JSON.parse(await fs.readFile('infrastructure/package.json', 'utf-8'));
+
+  packageJSON.dependencies = packageJSON.dependencies || {};
+
+  // get the package versions from this library to ensure they are in sync
+  const limgenPackageJson = JSON.parse(await fs.readFile(`${__dirname}/../package.json`, 'utf-8'));
+  packageJSON.dependencies['@pulumi/pulumi'] = limgenPackageJson.devDependencies['@pulumi/pulumi'];
+  packageJSON.dependencies['@pulumi/aws'] = limgenPackageJson.devDependencies['@pulumi/aws'];
+  packageJSON.dependencies['@pulumi/awsx'] = limgenPackageJson.devDependencies['@pulumi/awsx'];
+  packageJSON.dependencies['@pulumi/random'] = limgenPackageJson.devDependencies['@pulumi/random'];
+
+  await fs.writeFile('infrastructure/package.json', JSON.stringify(packageJSON, null, 2));
 }
