@@ -76,7 +76,7 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     return new aws.rds.Cluster("DBCluster", deepMerge({
       clusterIdentifier: prefixed('cluster'),
       engine: aws.rds.EngineType.AuroraPostgresql,
-      databaseName: pulumi.getProject(),
+      databaseName: 'postgres',
       masterUsername: "postgres",
       dbSubnetGroupName: this.subnetGroup.name,
       vpcSecurityGroupIds: this.securityGroups.map(sg => sg.id),
