@@ -1,8 +1,8 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
-import { prefixed } from "@/utils/prefixed";
-import { deepMerge } from "@/utils/deep-merge";
+import { prefixed } from "../utils/prefixed";
+import { deepMerge } from "../utils/deep-merge";
 
 export interface FullstackServiceAWSArgs {
   cdnHostname?: pulumi.Input<string>;
@@ -181,13 +181,12 @@ export class AppFargate extends pulumi.ComponentResource {
       buildArgs.INPUT_CDN_URL = pulumi.interpolate`https://${this._args.cdnHostname}`;
     }
 
-    return new awsx.ecr.Image("Image", {
+    return new awsx.ecr.Image("Image", deepMerge({
       repositoryUrl: this.ecrRepository.url,
       context: "..",
       args: buildArgs,
       platform: "linux/amd64",
-      ...this._args.imageArgs,
-    });
+    }, this._args.imageArgs));
   }
   getEcrRepository(): awsx.ecr.Repository | null {
     if (this._args.repositoryUrl) {

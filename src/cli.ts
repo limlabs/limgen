@@ -41,8 +41,8 @@ export async function cli() {
     });
   }
 
-  let includeDbInput = process.argv[3];
-  while (includeDbInput.toLowerCase() !== 'y' && includeDbInput.toLowerCase() !== 'n') {
+  let includeDbInput = process.argv[3]?.toLowerCase();
+  while (includeDbInput !== 'y' && includeDbInput !== 'n') {
     console.log('Would you like to include a database? (Y/n)');
     includeDbInput = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
@@ -51,8 +51,8 @@ export async function cli() {
     });
   } ;
 
-  let includeStorageInput = process.argv[4];
-  while (includeStorageInput.toLowerCase() !== 'y' && includeStorageInput.toLowerCase() !== 'n') {
+  let includeStorageInput = process.argv[4]?.toLowerCase();
+  while (includeStorageInput !== 'y' && includeStorageInput !== 'n') {
     console.log('Would you like to include storage? (Y/n)');
     includeStorageInput = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {

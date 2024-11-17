@@ -1,10 +1,12 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
-import { prefixed } from "@/utils/prefixed";
+import { prefixed } from "../utils/prefixed";
+import { deepMerge } from "../utils/deep-merge";
 
 export interface LoadBalancerAlbPublicArgs {
   vpc: awsx.ec2.Vpc;
+  albConfig?: awsx.lb.ApplicationLoadBalancerArgs;
 }
 
 export class LoadBalancerAlbPublic extends pulumi.ComponentResource {
@@ -16,7 +18,7 @@ export class LoadBalancerAlbPublic extends pulumi.ComponentResource {
     super("limgen:LoadBalancerAlbPublic", name, {}, opts);
     this._args = args;
 
-    this.lb = new awsx.lb.ApplicationLoadBalancer("LoadBalancer", {
+    this.lb = new awsx.lb.ApplicationLoadBalancer("LoadBalancer", deepMerge({
       name: prefixed("lb"),
       defaultSecurityGroup: {
         args: {
@@ -54,7 +56,7 @@ export class LoadBalancerAlbPublic extends pulumi.ComponentResource {
       listener: {
         port: 80,
       },
-    });
+    }, this._args.albConfig));
 
     this.registerOutputs({
     });

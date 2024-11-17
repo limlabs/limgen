@@ -2,7 +2,8 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
-import { prefixed } from "@/utils/prefixed";
+import { prefixed } from "../utils/prefixed";
+import { deepMerge } from "../utils/deep-merge";
 
 export interface CdnCloudFrontArgs {
   lb: awsx.lb.ApplicationLoadBalancer,
@@ -72,7 +73,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
       });
     }
 
-    return new aws.cloudfront.Distribution("CloudFrontDistribution", {
+    return new aws.cloudfront.Distribution("CloudFrontDistribution", deepMerge({
       enabled: true,
       origins,
       orderedCacheBehaviors,
@@ -99,8 +100,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
           restrictionType: "none",
         },
       },
-      ...this._args.cloudFrontDistributionArgs
-    });
+    }, this._args.cloudFrontDistributionArgs));
   }
   getOriginBucketPolicy(): aws.s3.BucketPolicy {
     if (!this._args.storage) {

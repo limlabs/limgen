@@ -2,7 +2,8 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as random from "@pulumi/random";
-import { prefixed } from "@/utils/prefixed";
+import { prefixed } from "../utils/prefixed";
+import { deepMerge } from "../utils/deep-merge";
 
 export interface PostgresRdsClusterArgs {
   vpc: awsx.ec2.Vpc;
@@ -38,7 +39,7 @@ export const defaultPostgresRdsClusterArgs: PostgresRdsClusterArgs = {
 
 export class PostgresRdsCluster extends pulumi.ComponentResource {
   _args: PostgresRdsClusterArgs;
-  
+
   vpc: awsx.ec2.Vpc;
   password?: pulumi.Input<string> | random.RandomPassword;
   dbCluster: aws.rds.Cluster;
@@ -72,7 +73,7 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     });
   }
   getDbCluster(): aws.rds.Cluster {
-    return new aws.rds.Cluster("DBCluster", {
+    return new aws.rds.Cluster("DBCluster", deepMerge({
       clusterIdentifier: prefixed('cluster'),
       engine: aws.rds.EngineType.AuroraPostgresql,
       databaseName: pulumi.getProject(),
@@ -80,21 +81,23 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
       dbSubnetGroupName: this.subnetGroup.name,
       vpcSecurityGroupIds: this.securityGroups.map(sg => sg.id),
       skipFinalSnapshot: true,
-      ...this._args.clusterConfig,
-      masterPassword: this.getPasswordValue(),
-    });
+    }, { 
+      ...this._args.clusterConfig, 
+      masterPassword: this.getPasswordValue() 
+    }));
   }
   getDatabases(): aws.rds.ClusterInstance[] {
     if (this._args.databaseConfigs) {
       return this._args.databaseConfigs.map((config, index) => {
-        return new aws.rds.ClusterInstance(`DBInstance-${index}`, {
+        return new aws.rds.ClusterInstance(`DBInstance-${index}`, deepMerge({
           dbSubnetGroupName: this.subnetGroup.name,
           clusterIdentifier: this.dbCluster.id,
           publiclyAccessible: true,
           identifier: prefixed(`db-instance-${index}`),
+        }, {
           ...config,
           engine: aws.rds.EngineType.AuroraPostgresql,
-        });
+        }));
       });
     }
 
@@ -143,7 +146,7 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     if (!this._args.vpc) {
       throw new Error("VPC is required for RDS cluster");
     }
-    
+
     return this._args.vpc;
   }
 

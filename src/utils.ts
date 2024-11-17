@@ -35,9 +35,6 @@ export async function generateTSConfig() {
   const tsconfig = JSON.stringify({
     "compilerOptions": {
       "baseUrl": ".",
-      "paths": {
-        "@/*": ["src/*"]
-      },
       "target": "ES6",
       "module": "commonjs",
       "strict": true,

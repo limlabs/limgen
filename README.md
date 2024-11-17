@@ -3,6 +3,7 @@
 Must have:
 
 - [ ] Deep merge objects
+- [ ] Only copy files that are needed
 - [ ] CLI implementation
 - [ ] Component templating
 - [ ] Documentation
@@ -22,8 +23,14 @@ Like to have:
 - DB Provider - Vercel
 - DB Provider - Fly.io
 - CDN Provider - Cloudflare
+- Resource - Bastion
 
-Future:
+Help Wanted:
 
 - DB Provider - Prisma
+- DB Provider - Supabase
 - App Provider - AWS Lambda
+
+Missing Test Coverage:
+
+- Deep Merge - used in pretty much all the components
