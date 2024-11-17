@@ -1,0 +1,11 @@
+name: nextjs-fullstack
+description: A pulumi project created with limgen
+runtime:
+  name: nodejs
+  options:
+    packagemanager: pnpm
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-typescript
+  

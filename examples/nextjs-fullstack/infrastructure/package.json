@@ -1,0 +1,10 @@
+{
+  "name": "infrastructure",
+  "version": "1.0.0",
+  "dependencies": {
+    "@pulumi/pulumi": "^3.138.0",
+    "@pulumi/aws": "^6.59.1",
+    "@pulumi/awsx": "^2.18.1",
+    "@pulumi/random": "^4.16.7"
+  }
+}

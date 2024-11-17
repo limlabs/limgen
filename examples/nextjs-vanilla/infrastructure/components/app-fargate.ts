@@ -1,13 +1,11 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
-import { prefixed } from "@/utils/prefixed";
-import { deepMerge } from "@/utils/deep-merge";
 
 export interface FullstackServiceAWSArgs {
   cdnHostname?: pulumi.Input<string>;
   repositoryUrl?: pulumi.Input<string>;
-  storage?: aws.s3.BucketV2;
+  mediaBucket?: aws.s3.BucketV2;
   connectionStringSecret?: aws.secretsmanager.Secret;
   connectionStringEnvironmentVariableName?: pulumi.Input<string>;
   ecrRepository?: awsx.ecr.Repository | null;
@@ -23,7 +21,7 @@ export interface FullstackServiceAWSArgs {
 }
 
 export const defaultFullstackServiceAWSArgs: FullstackServiceAWSArgs = {
-  storage: null as any,
+  mediaBucket: null as any,
   connectionStringEnvironmentVariableName: "DATABASE_URL",
   connectionStringSecret: null as any,
   cluster: null as any,
@@ -37,6 +35,7 @@ export const defaultFullstackServiceAWSArgs: FullstackServiceAWSArgs = {
 
 export class AppFargate extends pulumi.ComponentResource {
   _args: FullstackServiceAWSArgs;
+  _stack: string;
 
   cluster: aws.ecs.Cluster;
   executionRole: aws.iam.Role;
@@ -49,6 +48,7 @@ export class AppFargate extends pulumi.ComponentResource {
   constructor(name: string = 'App', args: FullstackServiceAWSArgs, opts?: pulumi.ComponentResourceOptions) {
     super("limgen:EcsClusterComponent", name, {}, opts);
     this._args = Object.assign({}, defaultFullstackServiceAWSArgs, args);
+    this._stack = pulumi.getStack();
     this.cluster = this.getCluster();
     this.executionRole = this.getExecutionRole();
     this.taskRole = this.getTaskRole();
@@ -104,10 +104,10 @@ export class AppFargate extends pulumi.ComponentResource {
       });
     }
 
-    if (this._args.storage) {
+    if (this._args.mediaBucket) {
       environmentParams.push({
         name: "BUCKET_NAME",
-        value: this._args.storage.bucket,
+        value: this._args.mediaBucket.bucket,
       });
     }
 
@@ -156,8 +156,8 @@ export class AppFargate extends pulumi.ComponentResource {
       },
     };
   
-    return new awsx.ecs.FargateService("Service", {
-      name: prefixed('service'),
+    return new awsx.ecs.FargateService("service", {
+      name: pulumi.interpolate`${pulumi.getProject()}-${this._stack}-app`,
       cluster: this.cluster.arn,
       networkConfiguration,
       loadBalancers,
@@ -166,10 +166,11 @@ export class AppFargate extends pulumi.ComponentResource {
   }
   getImage(): awsx.ecr.Image {
     if (this._args.repositoryUrl) {
-      return new awsx.ecr.Image("Image", deepMerge({
+      return new awsx.ecr.Image("image", {
         repositoryUrl: this._args.repositoryUrl,
         platform: "linux/amd64",
-      }, this._args.imageArgs));
+        ...this._args.imageArgs,
+      });
     }
 
     if (!this.ecrRepository) {
@@ -181,7 +182,7 @@ export class AppFargate extends pulumi.ComponentResource {
       buildArgs.INPUT_CDN_URL = pulumi.interpolate`https://${this._args.cdnHostname}`;
     }
 
-    return new awsx.ecr.Image("Image", {
+    return new awsx.ecr.Image("image", {
       repositoryUrl: this.ecrRepository.url,
       context: "..",
       args: buildArgs,
@@ -198,8 +199,8 @@ export class AppFargate extends pulumi.ComponentResource {
       return this._args.ecrRepository;
     }
 
-    return new awsx.ecr.Repository("Repo", {
-      name: this.getContainerName(),
+    return new awsx.ecr.Repository("repo", {
+      name: pulumi.interpolate`blog-${this._stack}`,
       forceDelete: true,
     });
   }
@@ -208,8 +209,8 @@ export class AppFargate extends pulumi.ComponentResource {
       return this._args.taskRole;
     }
 
-    const taskRole = new aws.iam.Role("TaskRole", {
-      name: prefixed('task-role'),
+    const taskRole = new aws.iam.Role("AppTaskRole", {
+      name: pulumi.interpolate`blog-${this._stack}-app-task-role`,
       assumeRolePolicy: JSON.stringify({
         Version: "2012-10-17",
         Statement: [
@@ -224,9 +225,9 @@ export class AppFargate extends pulumi.ComponentResource {
       }),
     });
 
-    if (this._args.storage) {
+    if (this._args.mediaBucket) {
       new aws.iam.RolePolicy("TaskRolePolicy", {
-        name: prefixed('task-role-policy'),
+        name: pulumi.interpolate`blog-${this._stack}-app-task-role-policy`,
         role: taskRole,
         policy: {
           Version: "2012-10-17",
@@ -237,7 +238,7 @@ export class AppFargate extends pulumi.ComponentResource {
                 "s3:PutObjectAcl",
               ],
               Effect: "Allow",
-              Resource: [pulumi.interpolate`${this._args.storage.arn}/*`],
+              Resource: [pulumi.interpolate`${this._args.mediaBucket.arn}/*`],
             }
           ],
         }
@@ -251,8 +252,8 @@ export class AppFargate extends pulumi.ComponentResource {
       return this._args.cluster;
     }
 
-    return new aws.ecs.Cluster("Cluster", {
-      name: prefixed('cluster'),
+    return new aws.ecs.Cluster("cluster", {
+      name: pulumi.interpolate`blog-${this._stack}-cluster`,
     });
   }
   getExecutionRole(): aws.iam.Role {
@@ -261,7 +262,7 @@ export class AppFargate extends pulumi.ComponentResource {
     }
 
     const executionRole = new aws.iam.Role("AppExecutionRole", {
-      name: prefixed('execution-role'),
+      name: pulumi.interpolate`blog-${this._stack}-app-execution-role`,
       assumeRolePolicy: JSON.stringify({
         Version: "2012-10-17",
         Statement: [
@@ -283,8 +284,8 @@ export class AppFargate extends pulumi.ComponentResource {
 
     if (this._args.connectionStringSecret) {
       new aws.iam.RolePolicy("ExecutionRolePolicy", {
-        role: executionRole,
-        name: prefixed('execution-role-policy'),
+        role: this.executionRole,
+        name: pulumi.interpolate`blog-${this._stack}-app-execution-role-policy`,
         policy: this._args.connectionStringSecret.arn.apply(arn => JSON.stringify({
           Version: "2012-10-17",
           Statement: [
@@ -301,7 +302,7 @@ export class AppFargate extends pulumi.ComponentResource {
     return executionRole;
   }
 
-  getContainerName() {
-    return prefixed('app');
+  getContainerName(): pulumi.Output<string> {
+    return pulumi.interpolate`${pulumi.getProject()}-${this._stack}-app`;
   }
 }
