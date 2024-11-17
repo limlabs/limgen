@@ -44,7 +44,7 @@ export async function generateTSConfig() {
       "baseUrl": ".",
       "target": "ES6",
       "module": "commonjs",
-      "strict": true,
+      "strict": false,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true
