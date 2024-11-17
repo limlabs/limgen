@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { generateIndexFile, generateProjectYaml, generateTSConfig } from './utils';
+import { copyDependencies, generateIndexFile, generateProjectYaml, generateTSConfig, importProject } from './utils';
 
 /**
  * 1. Creates a new directory if not exists called infrastructure
@@ -27,14 +27,14 @@ export async function cli() {
   }
 
   // Get the component name from the first argument
-  let componentName = process.argv[2];
+  let projectName = process.argv[2];
 
   // prompt for component name and read from stdin if not provided
-  while (!componentName) {
+  while (!projectName) {
     // prompt for component name
-    console.log('Please provide a component name:');
+    console.log('Please provide a project name:');
     // read from stdin
-    componentName = await new Promise((resolve) => {
+    projectName = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
         resolve((data ?? '').toString().trim());
       });
@@ -73,22 +73,21 @@ export async function cli() {
 
   // generate tsconfig.json
   await generateTSConfig();
-
-  // create components directory
-  await fs.mkdir('infrastructure/components', { recursive: true });
   
   // copy src/utils to $cwd/infrastructure/utils
   await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
   
-  // copy src/components/{componentName}.ts to $cwd/infrastructure/components/{componentName}.ts
-  await fs.cp(`${__dirname}/components`, 'infrastructure/components', { recursive: true });
+  const opts = {
+    projectName,
+    includeDb,
+    includeStorage,
+  };
+  
+  const project = await importProject('fullstack-aws');
 
-  // generate the index.ts file
-  await generateIndexFile({ includeDb, includeStorage });
-
-  // generate the Pulumi.yaml file
-  await generateProjectYaml({ projectName: componentName });
-
+  await copyDependencies(project, opts);
+  await generateIndexFile(project, opts);
+  await generateProjectYaml({ projectName });
 
   // check if infrastructure/package.json exists
   try {

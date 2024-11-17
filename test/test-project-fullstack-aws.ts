@@ -1,5 +1,5 @@
 import test, { describe } from 'node:test';
-import { fullstackAWSProject, FullstackAWSProjectOptions } from '@/projects/fullstack-aws';
+import fullstackAWSProject, { FullstackAWSProjectOptions } from '@/projects/fullstack-aws';
 import assert from 'node:assert';
 
 describe('fullstackAWSProject', () => {

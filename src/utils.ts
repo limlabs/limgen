@@ -1,14 +1,21 @@
 import fs from 'fs/promises';
-import { fullstackAWSProject, FullstackAWSProjectOptions } from './projects/fullstack-aws';
 
 export interface ProjectYamlOptions {
   projectName: string;
 }
 
-export type ProjectOptions = FullstackAWSProjectOptions;
+export type LimgenProjectType = 'fullstack-aws';
+export type LimgenProject<TOpts = unknown> = {
+  default: (opts?: TOpts) => Promise<string>;
+  dependsOn: (opts?: TOpts) => Promise<string[]>;
+}
 
-export async function generateIndexFile(opts: ProjectOptions) {
-  const result = await fullstackAWSProject(opts);
+export async function importProject(projectType: LimgenProjectType): Promise<LimgenProject> {
+  return await import(`./projects/${projectType}`);
+}
+
+export async function generateIndexFile(project: LimgenProject, opts: unknown) {
+  const result = await project.default(opts);
 
   await fs.writeFile('infrastructure/index.ts', result);
 }
@@ -47,4 +54,14 @@ export async function generateTSConfig() {
   }, null, 2)
 
   await fs.writeFile('infrastructure/tsconfig.json', tsconfig);
+}
+
+export async function copyDependencies(project: LimgenProject, opts: unknown) {
+  const deps = await project.dependsOn(opts);
+
+  await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
+  await fs.mkdir('infrastructure/components', { recursive: true });
+  for (const dep of deps) {
+    await fs.copyFile(`${__dirname}/${dep}`, `infrastructure/${dep}`);
+  }
 }
