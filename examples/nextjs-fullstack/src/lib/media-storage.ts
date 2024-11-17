@@ -26,7 +26,7 @@ const blobStorageProvider: MediaStorageProvider = {
 
     // Upload the image data to the S3 bucket
     await s3.send(new PutObjectCommand({
-      Bucket: process.env.MEDIA_BUCKET_NAME,
+      Bucket: process.env.BUCKET_NAME,
       Key: key,
       Body: data,
     }));
@@ -37,7 +37,7 @@ const blobStorageProvider: MediaStorageProvider = {
   },
 };
 
-const defaultStorageProvider = process.env.MEDIA_BUCKET_NAME
+const defaultStorageProvider = process.env.BUCKET_NAME
   ? blobStorageProvider
   : localStorageProvider;
 export const media = defaultStorageProvider;

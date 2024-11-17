@@ -30,7 +30,7 @@ describe('fullstackFargateTemplate', () => {
     assert.ok(template.includes('const storage = new StorageS3;'));
     assert.ok(template.includes('const cdn = new CdnCloudFront'));
     assert.ok(template.includes('mediaBucket: storage.mediaBucket,'));
-    assert.ok(template.includes('export const mediaBucket = storage.mediaBucket.bucket;'));
+    assert.ok(template.includes('export const objectStorageBucket = storage.mediaBucket.bucket;'));
     assert.ok(!template.includes('import { PostgresRdsClusterComponent }'));
     assert.ok(!template.includes('const db = new PostgresRdsClusterComponent'));
     assert.ok(!template.includes('connectionStringSecret: db.connectionStringSecret,'));
@@ -65,7 +65,7 @@ describe('fullstackFargateTemplate', () => {
     assert.ok(template.includes('import { StorageS3 }'));
     assert.ok(template.includes('const storage = new StorageS3;'));
     assert.ok(template.includes('mediaBucket: storage.mediaBucket,'));
-    assert.ok(template.includes('export const mediaBucket = storage.mediaBucket.bucket;'));
+    assert.ok(template.includes('export const objectStorageBucket = storage.mediaBucket.bucket;'));
     assert.ok(template.includes('import { PostgresRdsCluster }'));
     assert.ok(template.includes('const db = new PostgresRdsCluster'));
     assert.ok(template.includes('connectionStringSecret: db.connectionStringSecret,'));

@@ -163,7 +163,7 @@ With the resources already in place, it's fairly straightforward to add a CI/CD 
 4. In the GitHub repo interface, go the Settings --> Secrets and Variables --> Actions
 5. Add the following variables:
 
-   - `MEDIA_BUCKET_NAME` - can get this from `.env.production`
+   - `BUCKET_NAME` - can get this from `.env.production`
    - `PULUMI_STATE_BUCKET` - can get this from section 2 (e.g. `s3://blog-deploy-example-pulumi-<yourname>` )
 
 6. Add the following secrets:
