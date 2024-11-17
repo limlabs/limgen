@@ -28,7 +28,7 @@ export async function cli() {
 
   // Get the component name from the first argument
   let componentName = process.argv[2];
-  
+
   // prompt for component name and read from stdin if not provided
   while (!componentName) {
     // prompt for component name
@@ -36,34 +36,36 @@ export async function cli() {
     // read from stdin
     componentName = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
-        resolve(data.toString().trim());
+        resolve((data ?? '').toString().trim());
       });
     });
   }
 
   let includeDbInput = 'y';
-  while (includeDbInput.toLowerCase() !== 'y' && includeDbInput.toLowerCase() !== 'n') {
+  do {
     console.log('Would you like to include a database? (Y/n)');
     includeDbInput = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
-        resolve(data.toString().trim());
+        resolve((data ?? 'y').toString().trim());
       });
     });
-  }
+  } while (includeDbInput.toLowerCase() !== 'y' && includeDbInput.toLowerCase() !== 'n');
 
   let includeStorageInput = 'y';
-  while (includeStorageInput.toLowerCase() !== 'y' && includeStorageInput.toLowerCase() !== 'n') {
+  do {
     console.log('Would you like to include storage? (Y/n)');
     includeStorageInput = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
-        resolve(data.toString().trim());
+        resolve((data ?? 'y').toString().trim());
       });
     });
-  }
+  } while (includeStorageInput.toLowerCase() !== 'y' && includeStorageInput.toLowerCase() !== 'n');
 
   const includeDb = includeDbInput.toLowerCase() === 'y' ? true : false;
   const includeStorage = includeStorageInput.toLowerCase() === 'y' ? true : false;
 
+  console.log('Including DB:', includeDb);
+  console.log('Including Storage:', includeStorage);
   // TODO: Check if pulumi is logged in
 
   // create infrastructure directory

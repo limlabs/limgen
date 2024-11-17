@@ -13,20 +13,17 @@ const lb = new LoadBalancerAlbPublic('LoadBalancer', {
   vpc: publicVpc.vpc,
 });
 <% if (includeStorage) { %>
-const storage = new StorageS3;
-<% } %><% if (includeDb) { %>
-const db = new PostgresRdsClusterComponent('Database', { vpc: publicVpc }); 
-<% } %>
+const storage = new StorageS3;<% } %><% if (includeDb) { %>
+const db = new PostgresRdsCluster('Database', { vpc: publicVpc.vpc });<% } %>
 const cdn = new CdnCloudFront('CDN', {
   lb: lb.lb,<% if (includeStorage) { %>
-  mediaBucket: storage.mediaBucket,<% } %>
+  objectStorage: storage.mediaBucket,<% } %>
 });
 
 const app = new AppFargate('App', {
   vpc: publicVpc.vpc,
   loadBalancer: lb.lb,
   cdnHostname: cdn.distribution.domainName,<% if (includeDb) { %>
-  dbCluster: db.dbCluster,
   connectionStringSecret: db.connectionStringSecret, <% } %><% if (includeStorage) { %>
   mediaBucket: storage.mediaBucket,<% } %>
 });
@@ -35,12 +32,7 @@ export const vpcId = publicVpc.vpc.vpcId;
 export const publicSubnetIds = publicVpc.vpc.publicSubnetIds;
 export const cluster = app.cluster.arn;
 export const service = app.service.service.name;
-export const loadBalancerOrigin = pulumi.interpolate`http://${lb.lb.loadBalancer.dnsName}`;
-export const cdnHostname = pulumi.interpolate`https://${cdn.distribution.domainName}`;
-<% if (includeStorage) { %>
-export const mediaBucket = storage.mediaBucket.bucket;
-<% } %>
-<% if (includeDb) { %>
+export const cdnHostname = pulumi.interpolate`https://${cdn.distribution.domainName}`;<% if (includeStorage) { %>
+export const objectStorageBucket = storage.mediaBucket.bucket;<% } %><% if (includeDb) { %>
 export const dbCluster = db.dbCluster.clusterIdentifier;
-export const dbSecret = db.dbCluster.secret.secretName;
-<% } %>
+export const dbSecret = db.connectionStringSecret.arn;<% } %>
