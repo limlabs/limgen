@@ -66,7 +66,7 @@ describe('cli', async () => {
     assert(indexFile.includes('import { PostgresRdsCluster }'));
   });
 
-  test.skip('cli installs files without db and storage', async (t) => {
+  test('cli installs files without db and storage', async (t) => {
     const mockInputs = ['nextjs-blog', 'n', 'n'];
     let currentInput = 0;
     // mock process
