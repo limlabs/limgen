@@ -2,14 +2,13 @@
 
 Must have:
 
-- [ ] Full stack example
-- [ ] Fix names
 - [ ] Deep merge objects
 - [ ] CLI implementation
 - [ ] Component templating
 - [ ] Documentation
 - [ ] Package publish
 - [ ] Readme
+- [ ] Cloudfront --> S3 configuration
 
 Like to have:
 

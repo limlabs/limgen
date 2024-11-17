@@ -2,7 +2,7 @@ import test, { describe } from 'node:test';
 import { fullstackAWSProject, FullstackAWSProjectOptions } from '@/projects/fullstack-aws';
 import assert from 'node:assert';
 
-describe('fullstackFargateTemplate', () => {
+describe('fullstackAWSProject', () => {
   test('should generate template without storage and db', async () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: false,
@@ -10,13 +10,8 @@ describe('fullstackFargateTemplate', () => {
     };
     const template = await fullstackAWSProject(opts);
     assert(!template.includes('import { StorageS3 }'));
-    assert(!template.includes('import { PostgresRdsClusterComponent }'));
+    assert(!template.includes('import { PostgresRdsCluster }'));
     assert(!template.includes('const storage = new StorageS3;'));
-    assert(!template.includes('const db = new PostgresRdsClusterComponent'));
-    assert(!template.includes('mediaBucket: storage.mediaBucket,'));
-    assert(!template.includes('connectionStringSecret: db.connectionStringSecret,'));
-    assert(!template.includes('export const mediaBucket = storage.mediaBucket.bucket;'));
-    assert(!template.includes('export const dbCluster = db.dbCluster.clusterIdentifier;'));
   });
 
   test('should generate template with storage', async () => {
@@ -29,10 +24,9 @@ describe('fullstackFargateTemplate', () => {
     assert.ok(template.includes('import { StorageS3 }'));
     assert.ok(template.includes('const storage = new StorageS3;'));
     assert.ok(template.includes('const cdn = new CdnCloudFront'));
-    assert.ok(template.includes('mediaBucket: storage.mediaBucket,'));
-    assert.ok(template.includes('export const objectStorageBucket = storage.mediaBucket.bucket;'));
-    assert.ok(!template.includes('import { PostgresRdsClusterComponent }'));
-    assert.ok(!template.includes('const db = new PostgresRdsClusterComponent'));
+    assert.ok(template.includes('storage: storage.bucket,'));
+    assert.ok(template.includes('export const objectStorageBucket = storage.bucket.bucket;'));
+    assert.ok(!template.includes('import { PostgresRdsCluster }'));
     assert.ok(!template.includes('connectionStringSecret: db.connectionStringSecret,'));
     assert.ok(!template.includes('export const dbCluster = db.dbCluster.clusterIdentifier;'));
   });
@@ -50,8 +44,8 @@ describe('fullstackFargateTemplate', () => {
     assert.ok(template.includes('export const dbCluster = db.dbCluster.clusterIdentifier;'));
     assert.ok(!template.includes('import { StorageS3 }'));
     assert.ok(!template.includes('const storage = new StorageS3;'));
-    assert.ok(!template.includes('mediaBucket: storage.mediaBucket,'));
-    assert.ok(!template.includes('export const mediaBucket = storage.mediaBucket.bucket;'));
+    assert.ok(!template.includes('storage: storage.bucket,'));
+    assert.ok(!template.includes('export const objectStorageBucket = storage.bucket.bucket;'));
   });
 
   test('should generate template with storage and db', async () => {
@@ -64,8 +58,8 @@ describe('fullstackFargateTemplate', () => {
     const template = await fullstackAWSProject(opts);
     assert.ok(template.includes('import { StorageS3 }'));
     assert.ok(template.includes('const storage = new StorageS3;'));
-    assert.ok(template.includes('mediaBucket: storage.mediaBucket,'));
-    assert.ok(template.includes('export const objectStorageBucket = storage.mediaBucket.bucket;'));
+    assert.ok(template.includes('storage: storage.bucket,'));
+    assert.ok(template.includes('export const objectStorageBucket = storage.bucket.bucket;'));
     assert.ok(template.includes('import { PostgresRdsCluster }'));
     assert.ok(template.includes('const db = new PostgresRdsCluster'));
     assert.ok(template.includes('connectionStringSecret: db.connectionStringSecret,'));

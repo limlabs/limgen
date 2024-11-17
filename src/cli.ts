@@ -71,9 +71,13 @@ export async function cli() {
   // create infrastructure directory
   // create components directory
   await fs.mkdir('infrastructure/components', { recursive: true });
-
+  
+  await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
+  
   // copy src/components/{componentName}.ts to $cwd/infrastructure/components/{componentName}.ts
   await fs.cp(`${__dirname}/components`, 'infrastructure/components', { recursive: true });
+
+  await fs.copyFile(`${__dirname}/../tsconfig.json`, 'infrastructure/tsconfig.json');
 
   // generate the index.ts file
   await generateIndexFile({ includeDb, includeStorage });
