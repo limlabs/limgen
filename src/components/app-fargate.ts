@@ -284,7 +284,7 @@ export class AppFargate extends pulumi.ComponentResource {
 
     if (this._args.connectionStringSecret) {
       new aws.iam.RolePolicy("ExecutionRolePolicy", {
-        role: this.executionRole,
+        role: executionRole,
         name: pulumi.interpolate`blog-${this._stack}-app-execution-role-policy`,
         policy: this._args.connectionStringSecret.arn.apply(arn => JSON.stringify({
           Version: "2012-10-17",

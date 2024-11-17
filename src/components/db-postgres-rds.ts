@@ -82,7 +82,7 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
       vpcSecurityGroupIds: this.securityGroups.map(sg => sg.id),
       skipFinalSnapshot: true,
       ...this._args.clusterConfig,
-      masterPassword: (this.password as pulumi.Output<string>)?.apply ? (this.password as pulumi.Output<string>) : (this.password as random.RandomPassword).result,
+      masterPassword: this.getPasswordValue(),
     });
   }
   getDatabases(): aws.rds.ClusterInstance[] {
@@ -160,7 +160,7 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
   }
 
   private getConnectionStringSecret() {
-    const connectionString = pulumi.interpolate`postgresql://${this.dbCluster.masterUsername}:${this.password}@${this.dbCluster.endpoint}:${this.dbCluster.port}/${this.dbCluster.databaseName}`;
+    const connectionString = pulumi.interpolate`postgresql://${this.dbCluster.masterUsername}:${this.getPasswordValue()}@${this.dbCluster.endpoint}:${this.dbCluster.port}/${this.dbCluster.databaseName}`;
     const stack = pulumi.getStack();
 
     this.connectionStringSecret = new aws.secretsmanager.Secret("connectionString", {
@@ -170,8 +170,13 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     new aws.secretsmanager.SecretVersion("connectionStringVersion", {
       secretId: this.connectionStringSecret.id,
       secretString: connectionString,
+      versionStages: ["AWSCURRENT"],
     });
 
     return this.connectionStringSecret;
+  }
+
+  private getPasswordValue() {
+    return (this.password as pulumi.Output<string>)?.apply ? (this.password as pulumi.Output<string>) : (this.password as random.RandomPassword).result
   }
 }
