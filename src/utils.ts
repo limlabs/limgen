@@ -1,7 +1,16 @@
 import fs from 'fs/promises';
+import { fullstackAWSProject, FullstackAWSProjectOptions } from './projects/fullstack-aws';
 
 export interface ProjectYamlOptions {
   projectName: string;
+}
+
+export type ProjectOptions = FullstackAWSProjectOptions;
+
+export async function generateIndexFile(opts: ProjectOptions) {
+  const result = await fullstackAWSProject(opts);
+
+  await fs.writeFile('infrastructure/index.ts', result);
 }
 
 export async function generateProjectYaml(opts: ProjectYamlOptions) {

@@ -35,7 +35,7 @@ export const defaultPostgresRdsClusterArgs: PostgresRdsClusterArgs = {
   ],
 };
 
-export class PostgresRdsClusterComponent extends pulumi.ComponentResource {
+export class PostgresRdsCluster extends pulumi.ComponentResource {
   _args: PostgresRdsClusterArgs;
   _stack: string;
   

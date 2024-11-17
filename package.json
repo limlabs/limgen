@@ -1,13 +1,14 @@
 {
   "name": "limgen",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Infrastructure as Code generator",
+  "bin": "./dist/cli.mjs",
   "engines": {
     "node": ">=22.11.0"
   },
   "scripts": {
-    "test": "tsx --test --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts"
+    "test": "tsx --test --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts",
+    "build": "npx pkgroll"
   },
   "keywords": [],
   "author": "Liminal Labs",
@@ -18,11 +19,11 @@
     "@pulumi/pulumi": "^3.138.0",
     "@pulumi/random": "^4.16.7",
     "@types/node": "^22.9.0",
-    "@types/ejs": "^3.1.5",
     "tsx": "^4.19.2",
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "@types/ejs": "^3.1.5",
     "ejs": "^3.1.10"
   }
 }

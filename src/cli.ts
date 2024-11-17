@@ -1,12 +1,5 @@
 import fs from 'fs/promises';
-import { fullstackFargateProject, FullstackFargateProjectOptions } from './projects/fullstack-fargate';
-import { generateProjectYaml } from './projects/utils';
-
-export async function generateIndexFile(opts: FullstackFargateProjectOptions) {
-  const result = await fullstackFargateProject(opts);
-
-  await fs.writeFile('infrastructure/index.ts', result);
-}
+import { generateIndexFile, generateProjectYaml } from './utils';
 
 /**
  * 1. Creates a new directory if not exists called infrastructure
@@ -15,20 +8,6 @@ export async function generateIndexFile(opts: FullstackFargateProjectOptions) {
  * 4. Write out command for standing up their new stack with the files in the infrastructure directory
  */
 export async function cli() {
-  // Get the component name from the first argument
-  let componentName = process.argv[2];
-  
-  // prompt for component name and read from stdin if not provided
-  while (!componentName) {
-    // prompt for component name
-    console.log('Please provide a component name:');
-    // read from stdin
-    componentName = await new Promise((resolve) => {
-      process.stdin.once('data', (data) => {
-        resolve(data.toString().trim());
-      });
-    });
-  }
 
   // Check if pulumi exists as a command
   try {
@@ -47,8 +26,46 @@ export async function cli() {
     process.exit(1);
   }
 
-  // Check if pulumi is logged in
+  // Get the component name from the first argument
+  let componentName = process.argv[2];
   
+  // prompt for component name and read from stdin if not provided
+  while (!componentName) {
+    // prompt for component name
+    console.log('Please provide a component name:');
+    // read from stdin
+    componentName = await new Promise((resolve) => {
+      process.stdin.once('data', (data) => {
+        resolve(data.toString().trim());
+      });
+    });
+  }
+
+  let includeDbInput = 'y';
+  while (includeDbInput.toLowerCase() !== 'y' && includeDbInput.toLowerCase() !== 'n') {
+    console.log('Would you like to include a database? (Y/n)');
+    includeDbInput = await new Promise((resolve) => {
+      process.stdin.once('data', (data) => {
+        resolve(data.toString().trim());
+      });
+    });
+  }
+
+  let includeStorageInput = 'y';
+  while (includeStorageInput.toLowerCase() !== 'y' && includeStorageInput.toLowerCase() !== 'n') {
+    console.log('Would you like to include storage? (Y/n)');
+    includeStorageInput = await new Promise((resolve) => {
+      process.stdin.once('data', (data) => {
+        resolve(data.toString().trim());
+      });
+    });
+  }
+
+  const includeDb = includeDbInput.toLowerCase() === 'y' ? true : false;
+  const includeStorage = includeStorageInput.toLowerCase() === 'y' ? true : false;
+
+  // TODO: Check if pulumi is logged in
+
   // create infrastructure directory
   // create components directory
   await fs.mkdir('infrastructure/components', { recursive: true });
@@ -57,7 +74,7 @@ export async function cli() {
   await fs.cp(`${__dirname}/components`, 'infrastructure/components', { recursive: true });
 
   // generate the index.ts file
-  await generateIndexFile({ includeDb: false, includeStorage: false });
+  await generateIndexFile({ includeDb, includeStorage });
 
   // generate the Pulumi.yaml file
   await generateProjectYaml({ projectName: componentName });
