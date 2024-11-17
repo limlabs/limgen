@@ -1,4 +1,4 @@
-name: nextjs-blog
+name: nextjs-vanilla
 description: A pulumi project created with limgen
 runtime:
   name: nodejs

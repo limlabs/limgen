@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { generateIndexFile, generateProjectYaml } from './utils';
+import { generateIndexFile, generateProjectYaml, generateTSConfig } from './utils';
 
 /**
  * 1. Creates a new directory if not exists called infrastructure
@@ -41,25 +41,25 @@ export async function cli() {
     });
   }
 
-  let includeDbInput = 'y';
-  do {
+  let includeDbInput = process.argv[3];
+  while (includeDbInput.toLowerCase() !== 'y' && includeDbInput.toLowerCase() !== 'n') {
     console.log('Would you like to include a database? (Y/n)');
     includeDbInput = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
         resolve((data ?? 'y').toString().trim());
       });
     });
-  } while (includeDbInput.toLowerCase() !== 'y' && includeDbInput.toLowerCase() !== 'n');
+  } ;
 
-  let includeStorageInput = 'y';
-  do {
+  let includeStorageInput = process.argv[4];
+  while (includeStorageInput.toLowerCase() !== 'y' && includeStorageInput.toLowerCase() !== 'n') {
     console.log('Would you like to include storage? (Y/n)');
     includeStorageInput = await new Promise((resolve) => {
       process.stdin.once('data', (data) => {
         resolve((data ?? 'y').toString().trim());
       });
     });
-  } while (includeStorageInput.toLowerCase() !== 'y' && includeStorageInput.toLowerCase() !== 'n');
+  }
 
   const includeDb = includeDbInput.toLowerCase() === 'y' ? true : false;
   const includeStorage = includeStorageInput.toLowerCase() === 'y' ? true : false;
@@ -69,21 +69,26 @@ export async function cli() {
   // TODO: Check if pulumi is logged in
 
   // create infrastructure directory
+  await fs.mkdir('infrastructure', { recursive: true });
+
+  // generate tsconfig.json
+  await generateTSConfig();
+
   // create components directory
   await fs.mkdir('infrastructure/components', { recursive: true });
   
+  // copy src/utils to $cwd/infrastructure/utils
   await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
   
   // copy src/components/{componentName}.ts to $cwd/infrastructure/components/{componentName}.ts
   await fs.cp(`${__dirname}/components`, 'infrastructure/components', { recursive: true });
-
-  await fs.copyFile(`${__dirname}/../tsconfig.json`, 'infrastructure/tsconfig.json');
 
   // generate the index.ts file
   await generateIndexFile({ includeDb, includeStorage });
 
   // generate the Pulumi.yaml file
   await generateProjectYaml({ projectName: componentName });
+
 
   // check if infrastructure/package.json exists
   try {

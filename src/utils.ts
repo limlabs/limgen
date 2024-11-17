@@ -30,3 +30,24 @@ config:
 
   await fs.writeFile('infrastructure/Pulumi.yaml', yaml);
 }
+
+export async function generateTSConfig() {
+  const tsconfig = JSON.stringify({
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["src/*"]
+      },
+      "target": "ES6",
+      "module": "commonjs",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true
+    },
+    "include": ["index.ts", "components/**/*.ts", "utils/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+  }, null, 2)
+
+  await fs.writeFile('infrastructure/tsconfig.json', tsconfig);
+}

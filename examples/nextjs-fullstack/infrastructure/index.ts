@@ -17,7 +17,7 @@ const storage = new StorageS3;
 const db = new PostgresRdsCluster('Database', { vpc: publicVpc.vpc });
 const cdn = new CdnCloudFront('CDN', {
   lb: lb.lb,
-  objectStorage: storage.mediaBucket,
+  storage: storage.bucket,
 });
 
 const app = new AppFargate('App', {
@@ -25,7 +25,7 @@ const app = new AppFargate('App', {
   loadBalancer: lb.lb,
   cdnHostname: cdn.distribution.domainName,
   connectionStringSecret: db.connectionStringSecret, 
-  mediaBucket: storage.mediaBucket,
+  storage: storage.bucket,
 });
 
 export const vpcId = publicVpc.vpc.vpcId;
@@ -33,6 +33,6 @@ export const publicSubnetIds = publicVpc.vpc.publicSubnetIds;
 export const cluster = app.cluster.arn;
 export const service = app.service.service.name;
 export const cdnHostname = pulumi.interpolate`https://${cdn.distribution.domainName}`;
-export const objectStorageBucket = storage.mediaBucket.bucket;
+export const objectStorageBucket = storage.bucket.bucket;
 export const dbCluster = db.dbCluster.clusterIdentifier;
 export const dbSecret = db.connectionStringSecret.arn;

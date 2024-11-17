@@ -25,6 +25,4 @@ export const vpcId = publicVpc.vpc.vpcId;
 export const publicSubnetIds = publicVpc.vpc.publicSubnetIds;
 export const cluster = app.cluster.arn;
 export const service = app.service.service.name;
-export const loadBalancerOrigin = pulumi.interpolate`http://${lb.lb.loadBalancer.dnsName}`;
 export const cdnHostname = pulumi.interpolate`https://${cdn.distribution.domainName}`;
-

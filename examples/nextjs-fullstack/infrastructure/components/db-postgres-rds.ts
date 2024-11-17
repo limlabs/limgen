@@ -2,6 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as random from "@pulumi/random";
+import { prefixed } from "@/utils/prefixed";
 
 export interface PostgresRdsClusterArgs {
   vpc: awsx.ec2.Vpc;
@@ -37,7 +38,6 @@ export const defaultPostgresRdsClusterArgs: PostgresRdsClusterArgs = {
 
 export class PostgresRdsCluster extends pulumi.ComponentResource {
   _args: PostgresRdsClusterArgs;
-  _stack: string;
   
   vpc: awsx.ec2.Vpc;
   password?: pulumi.Input<string> | random.RandomPassword;
@@ -54,7 +54,6 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
   ) {
     super("limgen:PostgresRdsClusterComponent", name, {}, opts);
     this._args = args;
-    this._stack = pulumi.getStack();
 
     this.password = this.getPassword();
     this.vpc = this.getVpc();
@@ -73,10 +72,10 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     });
   }
   getDbCluster(): aws.rds.Cluster {
-    return new aws.rds.Cluster("BlogDBCluster", {
-      clusterIdentifier: pulumi.interpolate`blog-${this._stack}-db-cluster`,
+    return new aws.rds.Cluster("DBCluster", {
+      clusterIdentifier: prefixed('cluster'),
       engine: aws.rds.EngineType.AuroraPostgresql,
-      databaseName: "blog",
+      databaseName: pulumi.getProject(),
       masterUsername: "postgres",
       dbSubnetGroupName: this.subnetGroup.name,
       vpcSecurityGroupIds: this.securityGroups.map(sg => sg.id),
@@ -88,11 +87,11 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
   getDatabases(): aws.rds.ClusterInstance[] {
     if (this._args.databaseConfigs) {
       return this._args.databaseConfigs.map((config, index) => {
-        return new aws.rds.ClusterInstance(`BlogDBInstance-${index}`, {
+        return new aws.rds.ClusterInstance(`DBInstance-${index}`, {
           dbSubnetGroupName: this.subnetGroup.name,
           clusterIdentifier: this.dbCluster.id,
           publiclyAccessible: true,
-          identifier: pulumi.interpolate`blog-${this._stack}-db-instance-${index}`,
+          identifier: prefixed(`db-instance-${index}`),
           ...config,
           engine: aws.rds.EngineType.AuroraPostgresql,
         });
@@ -100,13 +99,13 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     }
 
     return [
-      new aws.rds.ClusterInstance("BlogDBInstance", {
+      new aws.rds.ClusterInstance("DBInstance", {
         dbSubnetGroupName: this.subnetGroup.name,
         clusterIdentifier: this.dbCluster.id,
         engine: aws.rds.EngineType.AuroraPostgresql,
         publiclyAccessible: true,
         instanceClass: "db.t3.medium",
-        identifier: pulumi.interpolate`blog-${this._stack}-db-instance`,
+        identifier: prefixed('db-instance'),
       })
     ];
   }
@@ -134,8 +133,8 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     ]
   }
   getSubnetGroup(): aws.rds.SubnetGroup {
-    return new aws.rds.SubnetGroup("publicSubnetGroup", {
-      name: pulumi.interpolate`blog-${this._stack}-public-subnet-group`,
+    return new aws.rds.SubnetGroup("PublicSubnetGroup", {
+      name: prefixed('public-subnet-group'),
       subnetIds: this._args.subnetIds ?? this.vpc.publicSubnetIds,
     });
   }
@@ -153,7 +152,7 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
       return this._args.clusterConfig?.masterPassword
     }
 
-    return new random.RandomPassword("dbPassword", {
+    return new random.RandomPassword("DBPassword", {
       length: 24,
       special: false,
     })
@@ -163,14 +162,14 @@ export class PostgresRdsCluster extends pulumi.ComponentResource {
     const connectionString = pulumi.interpolate`postgresql://${this.dbCluster.masterUsername}:${this.getPasswordValue()}@${this.dbCluster.endpoint}:${this.dbCluster.port}/${this.dbCluster.databaseName}`;
     const stack = pulumi.getStack();
 
-    this.connectionStringSecret = new aws.secretsmanager.Secret("connectionString", {
-      namePrefix: pulumi.interpolate`blog-${stack}-connectionString-`
+    this.connectionStringSecret = new aws.secretsmanager.Secret("ConnectionString", {
+      namePrefix: prefixed("connection-string"),
     });
 
-    new aws.secretsmanager.SecretVersion("connectionStringVersion", {
+    new aws.secretsmanager.SecretVersion("ConnectionStringVersion", {
       secretId: this.connectionStringSecret.id,
       secretString: connectionString,
-      versionStages: ["v3", "AWSCURRENT"],
+      versionStages: ["AWSCURRENT"],
     });
 
     return this.connectionStringSecret;

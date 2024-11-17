@@ -1,6 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
+import { prefixed } from "@/utils/prefixed";
 
 export interface LoadBalancerAlbPublicArgs {
   vpc: awsx.ec2.Vpc;
@@ -8,20 +9,18 @@ export interface LoadBalancerAlbPublicArgs {
 
 export class LoadBalancerAlbPublic extends pulumi.ComponentResource {
   _args: LoadBalancerAlbPublicArgs;
-  _stack: string;
 
   lb: awsx.lb.ApplicationLoadBalancer;
 
   constructor(name: string = 'LoadBalancer', args: LoadBalancerAlbPublicArgs, opts?: pulumi.ComponentResourceOptions) {
     super("limgen:LoadBalancerAlbPublic", name, {}, opts);
     this._args = args;
-    this._stack = pulumi.getStack();
 
-    this.lb = new awsx.lb.ApplicationLoadBalancer("lb", {
-      name: pulumi.interpolate`blog-${this._stack}-lb`,
+    this.lb = new awsx.lb.ApplicationLoadBalancer("LoadBalancer", {
+      name: prefixed("lb"),
       defaultSecurityGroup: {
         args: {
-          name: pulumi.interpolate`blog-${this._stack}-public-ingress-sg-lb`,
+          name: prefixed("sg-lb"),
           vpcId: this._args.vpc.vpc.id,
           ingress: [
             {
@@ -44,7 +43,7 @@ export class LoadBalancerAlbPublic extends pulumi.ComponentResource {
       subnetIds: this._args.vpc.publicSubnetIds,
       defaultTargetGroup: {
         vpcId: this._args.vpc.vpcId,
-        name: pulumi.interpolate`blog-${this._stack}-tg`,
+        name: prefixed("tg"),
         port: 3000,
         targetType: "ip",
         deregistrationDelay: 10,

@@ -1,18 +1,17 @@
 
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
-import * as random from "@pulumi/random";
 import * as awsx from "@pulumi/awsx";
+import { prefixed } from "@/utils/prefixed";
 
 export interface CdnCloudFrontArgs {
   lb: awsx.lb.ApplicationLoadBalancer,
-  objectStorage?: aws.s3.BucketV2,
+  storage?: aws.s3.BucketV2,
   cloudFrontDistributionArgs?: aws.cloudfront.DistributionArgs
 }
 
 export class CdnCloudFront extends pulumi.ComponentResource {
   _args: CdnCloudFrontArgs;
-  _stack: string;
 
   distribution: aws.cloudfront.Distribution;
   originAccessIdentity: aws.cloudfront.OriginAccessIdentity;
@@ -20,12 +19,10 @@ export class CdnCloudFront extends pulumi.ComponentResource {
 
   constructor(name: string = 'CDN', args: CdnCloudFrontArgs, opts?: pulumi.ComponentResourceOptions) {
     super("limgen:CloudFrontComponent", name, {}, opts);
-    this._stack = pulumi.getStack();
     this._args = args;
-
     this.originAccessIdentity = this.getOriginAccessIdentity();
 
-    if (this._args.objectStorage) {
+    if (this._args.storage) {
       this.originBucketPolicy = this.getOriginBucketPolicy();
     }
 
@@ -38,7 +35,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
     const origins: aws.types.input.cloudfront.DistributionOrigin[] = [
       {
         domainName: this._args.lb.loadBalancer.dnsName,
-        originId: `blog-${this._stack}-origin`,
+        originId: prefixed("lb-origin"),
         customOriginConfig: {
           originProtocolPolicy: "http-only",
           httpPort: 80,
@@ -48,10 +45,10 @@ export class CdnCloudFront extends pulumi.ComponentResource {
       },
     ]
 
-    if (this._args.objectStorage) {
+    if (this._args.storage) {
       origins.push({
-        domainName: this._args.objectStorage.bucketRegionalDomainName,
-        originId: `blog-${this._stack}-media-origin`,
+        domainName: this._args.storage.bucketRegionalDomainName,
+        originId: prefixed("storage-origin"),
         s3OriginConfig: {
           originAccessIdentity: this.originAccessIdentity.cloudfrontAccessIdentityPath,
         },
@@ -59,7 +56,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
 
       orderedCacheBehaviors.push({
         pathPattern: "/media/*",
-        targetOriginId: `blog-${this._stack}-media-origin`,
+        targetOriginId: prefixed("storage-origin"),
         allowedMethods: ["GET", "HEAD", "OPTIONS"],
         cachedMethods: ["GET", "HEAD"],
         compress: true,
@@ -75,12 +72,12 @@ export class CdnCloudFront extends pulumi.ComponentResource {
       });
     }
 
-    return new aws.cloudfront.Distribution(`blog-${this._stack}-distribution`, {
+    return new aws.cloudfront.Distribution("CloudFrontDistribution", {
       enabled: true,
       origins,
       orderedCacheBehaviors,
       defaultCacheBehavior: {
-        targetOriginId: `blog-${this._stack}-origin`,
+        targetOriginId: prefixed("lb-origin"),
         viewerProtocolPolicy: "redirect-to-https",
         allowedMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"],
         cachedMethods: ["GET", "HEAD"],
@@ -106,14 +103,14 @@ export class CdnCloudFront extends pulumi.ComponentResource {
     });
   }
   getOriginBucketPolicy(): aws.s3.BucketPolicy {
-    if (!this._args.objectStorage) {
+    if (!this._args.storage) {
       throw new Error("Media bucket is required to create an origin bucket policy");
     }
 
     return new aws.s3.BucketPolicy("OriginBucketPolicy", {
-      bucket: this._args.objectStorage.id,
+      bucket: this._args.storage.id,
       policy: pulumi.all([
-        this._args.objectStorage.arn,
+        this._args.storage.arn,
         this.originAccessIdentity.iamArn
       ]).apply(([storageArn, iamArn]) => JSON.stringify({
         Version: "2012-10-17",
@@ -131,7 +128,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
     });
   }
   getOriginAccessIdentity(): aws.cloudfront.OriginAccessIdentity {
-    return new aws.cloudfront.OriginAccessIdentity(`blog-${this._stack}-oai`, {
+    return new aws.cloudfront.OriginAccessIdentity("OriginAccessIdentity", {
       comment: "OAI for CloudFront distribution to access S3 bucket",
     });
   }

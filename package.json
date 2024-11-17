@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "tsx --test --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts",
-    "build": "npx pkgroll"
+    "build": "npx pkgroll",
+    "update-examples": "scripts/update-examples.sh"
   },
   "keywords": [],
   "author": "Liminal Labs",
