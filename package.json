@@ -2,20 +2,21 @@
   "name": "limgen",
   "version": "1.0.0",
   "description": "Infrastructure as Code generator",
-  "bin": "./dist/cli.mjs",
+  "bin": "./dist/bin/index.js",
   "engines": {
     "node": ">=22.11.0"
   },
   "scripts": {
     "dev": "tsx src/bin/index.ts",
     "test": "tsx --test --experimental-test-module-mocks  --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts",
-    "build": "npx pkgroll",
+    "build": "scripts/build.sh",
     "update-examples": "scripts/update-examples.sh"
   },
   "keywords": [],
   "author": "Liminal Labs",
   "license": "MIT",
   "devDependencies": {
+    "tsc-alias": "1.8.10",
     "@pulumi/aws": "^6.59.1",
     "@pulumi/awsx": "^2.18.1",
     "@pulumi/pulumi": "^3.138.0",
@@ -24,14 +25,13 @@
     "@types/prompts": "^2.4.9",
     "@types/yargs": "^17.0.33",
     "tsx": "^4.19.2",
+    "prompts": "^2.4.2",
     "typescript": "^4.5.4"
   },
   "dependencies": {
     "@types/ejs": "^3.1.5",
     "commander": "^12.1.0",
     "ejs": "^3.1.10",
-    "prompts": "^2.4.2",
-    "yargs": "^17.7.2",
     "zod": "^3.23.8"
   }
 }

@@ -51,12 +51,7 @@ export const options = async () => {
   ]
 }
 
-export type FullstackAWSProjectOptions = {
-  includeStorage: NullableCliOption;
-  includeDb: NullableCliOption;
-};
-
-export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, args: FullstackAWSProjectOptions) => {
+export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, args: any) => {
   let includeStorage;
   if (args.includeStorage === 'unknown') {
     const answer = await prompts(
@@ -94,6 +89,12 @@ export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, 
     includeDb,
   };
 }
+
+export type FullstackAWSProjectOptions = {
+  includeStorage: boolean;
+  includeDb: boolean;
+};
+
 export default function fullstackAWSProject(opts: FullstackAWSProjectOptions): Promise<string> {
   return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), opts);
 }

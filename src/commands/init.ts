@@ -100,5 +100,5 @@ export const init = new Command()
     await installDependencies(packages);
 
     console.log('Project initialized successfully!');
-    console.log(`To start working on your project, run \`cd ${path.join('infrastructure', initArgs.projectName)} && pulumi up\``);
+    console.log(`To start working on your project, run \`cd ${path.join('infrastructure', 'projects', initArgs.projectName)} && pulumi up\``);
   });

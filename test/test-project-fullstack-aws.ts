@@ -18,7 +18,6 @@ describe('fullstackAWSProject', () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: true,
       includeDb: false,
-      storageProvider: 's3',
     };
     const template = await fullstackAWSProject(opts);
     assert.ok(template.includes('import { StorageS3 }'));
@@ -35,7 +34,6 @@ describe('fullstackAWSProject', () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: false,
       includeDb: true,
-      dbProvider: 'postgres',
     };
     const template = await fullstackAWSProject(opts);
     assert.ok(template.includes('import { PostgresRdsCluster }'));
@@ -52,8 +50,6 @@ describe('fullstackAWSProject', () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: true,
       includeDb: true,
-      storageProvider: 's3',
-      dbProvider: 'postgres',
     };
     const template = await fullstackAWSProject(opts);
     assert.ok(template.includes('import { StorageS3 }'));
