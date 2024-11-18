@@ -3,7 +3,19 @@
 set -e
 
 echo "Updating nextjs-fullstack..."
-(cd examples/nextjs-fullstack && rm -rf infrastructure && pnpm tsx ../../src/index.ts nextjs-fullstack y y && cd infrastructure && pnpm install)
+rm -rf examples/nextjs-fullstack/infrastructure
+pnpm dev init \
+  --directory examples/nextjs-fullstack \
+  --projectType fullstack-aws \
+  --name nextjs-fullstack \
+  --includeStorage=true \
+  --includeDb=true 
 
 echo "Updating nextjs-vanilla..."
-(cd examples/nextjs-vanilla && rm -rf infrastructure && pnpm tsx ../../src/index.ts nextjs-vanilla n n && cd infrastructure && pnpm install)
+rm -rf examples/nextjs-vanilla/infrastructure
+pnpm dev init \
+  --directory examples/nextjs-vanilla \
+  --projectType fullstack-aws \
+  --name nextjs-vanilla \
+  --includeStorage=false \
+  --includeDb=false 

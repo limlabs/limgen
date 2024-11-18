@@ -1,8 +1,11 @@
+import { initOptionsSchema } from '@/commands/init';
 import ejs from 'ejs';
 import path from 'path';
+import prompts from 'prompts';
+import z from 'zod';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
-  const deps: string[] = [
+  const files: string[] = [
     'components/app-fargate.ts',
     'components/cdn-cloudfront.ts',
     'components/lb-alb-public.ts',
@@ -11,31 +14,69 @@ export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
     'utils/prefixed.ts',
   ];
 
+  const packages = [
+    '@pulumi/aws',
+    '@pulumi/awsx',
+    '@pulumi/pulumi',
+  ];
+
   if (opts.includeStorage) {
-    deps.push('./components/storage-s3.ts');
+    files.push('components/storage-s3.ts');
   }
 
   if (opts.includeDb) {
-    deps.push('./components/db-postgres-rds.ts');
+    files.push('components/db-postgres-rds.ts');
+    packages.push('@pulumi/random');
   }
 
-  return deps;
+  return {
+    files,
+    packages,
+  };
+}
+
+export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, argv: Record<string, unknown>) => {
+  let includeStorage = argv.includeStorage as boolean;
+  if (includeStorage === undefined) {
+    const answer = await prompts(
+      {
+        type: 'confirm',
+        name: 'includeStorage',
+        message: 'Include storage?',
+      }
+    );  
+
+    includeStorage = answer.includeStorage;
+  }
+
+  let includeDb = argv.includeDb as boolean;
+  if (includeDb === undefined) {
+    const answer = await prompts(
+      {
+        type: 'confirm',
+        name: 'includeDb',
+        message: 'Include a database?',
+      }
+    );
+
+    includeDb = answer.includeDb;
+  }
+
+  return {
+    includeStorage,
+    includeDb,
+  };
 }
 
 export type FullstackAWSProjectOptions = {
   includeStorage: boolean;
   includeDb: boolean;
-  dbProvider?: 'postgres';
-  storageProvider?: 's3';
 };
 
 export default function fullstackAWSProject(opts: FullstackAWSProjectOptions): Promise<string> {
-  const { includeStorage, includeDb, storageProvider, dbProvider } = opts;
-
+  const { includeStorage, includeDb } = opts;
   return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), {
     includeStorage,
     includeDb,
-    storageProvider,
-    dbProvider,
   });
 }
