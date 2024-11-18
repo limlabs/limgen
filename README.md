@@ -4,9 +4,25 @@ Limgen is an infrastructure-as-code (IaC) generator for full-stack applications.
 
 Unlike other tools, Limgen does not wrap your infrastructure in abstractions. We define a standard layout and components for you to use with Pulumi, a popular open-source IaC framework. This allows you to start with working code, and customize it to meet your applications' resource, security, and maintenance needs over time.
 
-## Getting Started
+## Usage
 
-Eventually this will be published as a package on NPM. For now, this project is under active development.
+Eventually this will be published as a package on NPM. For now, this project is under active development and can be used by linking:
+
+1. Clone this repo
+1. Run `pnpm install`
+1. Run `pnpm build`
+1. Run `pnpm link --global`
+
+Now you should be able to run `limgen --help` and get stuff back. Yay!
+
+Each time you need to make an update, make sure to run `pnpm build`. You do not need to re-link after linking once.
+
+
+### Available subcommands
+
+- `init` - Initializes a new project from (eventually) one of several project types. Right now the only supported project type is `fullstack-aws`. Creates a workspace if it doesn't already exist
+- `add` (coming soon) - Adds a new component to the workspace
+
 
 ## Concepts
 
@@ -73,6 +89,12 @@ Keep in mind that while splitting projects later is possible, it's kind of painf
 
 ## Local Development
 
+### Prerequisites
+
+1. [Pulumi](https://www.pulumi.com/docs/iac/download-install/)
+1. [NVM](https://github.com/nvm-sh/nvm)
+1. [pnpm](https://pnpm.io/installation)
+
 ### Setup
 
 1. Clone the repo
@@ -84,11 +106,7 @@ Keep in mind that while splitting projects later is possible, it's kind of painf
 
 `pnpm dev <subcommand>` will run a command and output in `<repoRoot>/infrastructure`, which is gitignored.
 
-Available subcommands:
-
-- `init` - Initializes a new project from (eventually) one of several project types. Right now the only supported project type is `fullstack-aws`. Creates a workspace if it doesn't already exist
-- `add` (coming soon) - Adds a new component to the workspace
-
+Unlike using the linked or installed version, this does not require running `pnpm build` first.
 
 ### Run the unit tests
 
