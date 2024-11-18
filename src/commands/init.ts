@@ -1,31 +1,11 @@
 import z from 'zod';
-import { Command, Option } from 'commander';
+import { Command } from 'commander';
 import prompts from 'prompts';
-
-export type NullableCliOption = 'true' | 'false' | 'unknown';
-
-const cliBoolean = () => z.enum(['true', 'false', 'unknown'])
-  .transform((val) => val !== 'unknown' 
-    ? `${val === 'true'}` 
-    : 'unknown');
 
 import { detectFramework, getSupportedProjectTypesForFramework, FrameworkType } from '@/framework';
 import { AllProjectTypes, copyFileDependencies, generateIndexFile, generateProjectYaml, importProject, installDependencies, ProjectType } from '@/project';
 import { generatePackageJSON, initWorkspace } from '@/workspace';
-
-const parseProcessArgs = (args: string[] = process.argv.slice(2)): Record<string, string> => {
-  const result: Record<string, string> = {};
-  for (let i = 0; i < args.length; i++) {
-    let [key, value] = args[i].split('=');
-    if (!value && i + 1 < args.length && !args[i + 1].startsWith('-')) {
-      value = args[++i];
-    }
-    if (key) {
-      result[key.replace(/^--?/, '')] = value !== undefined ? value : 'true';
-    }
-  }
-  return result;
-};
+import { parseProcessArgs } from '@/cli-helpers';
 
 export const initOptionsSchema = z.object({
   directory: z.string().optional(),
@@ -101,8 +81,6 @@ export const init = new Command()
     }
 
     const parsedOptions = schema.parse(processArgs);
-    
-
     const opts = await project.collectInput(initArgs, parsedOptions);
     const { packages, files } = await project.dependsOn(opts);
 
@@ -121,5 +99,4 @@ export const init = new Command()
 
     console.log('Project initialized successfully!');
     console.log('To start working on your project, run `cd infrastructure && pulumi up`');
-
   });
