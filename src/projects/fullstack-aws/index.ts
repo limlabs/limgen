@@ -1,5 +1,5 @@
-import { initOptionsSchema, NullableCliOption } from '@/commands/init';
-import { cliBoolean } from '@/schema';
+import { initOptionsSchema } from '@/commands/init';
+import { cliBoolean, NullableCliOption } from '@/schema';
 import ejs from 'ejs';
 import path from 'path';
 import prompts from 'prompts';
@@ -50,7 +50,6 @@ export const options = async () => {
     },
   ]
 }
-
 
 export type FullstackAWSProjectOptions = {
   includeStorage: NullableCliOption;
