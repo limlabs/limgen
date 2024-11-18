@@ -1,5 +1,5 @@
-import { initOptionsSchema } from '@/commands/init';
-import { Option } from 'commander';
+import { initOptionsSchema, NullableCliOption } from '@/commands/init';
+import { cliBoolean } from '@/schema';
 import ejs from 'ejs';
 import path from 'path';
 import prompts from 'prompts';
@@ -36,44 +36,52 @@ export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   };
 }
 
-export interface FullstackAWSProjectCommandOptions {
-  includeStorage: boolean;
-  includeDb: boolean;
-}
-
-export const getCommandOptions = () => {
+export const options = async () => {
   return [
-    new Option('-s, --includeStorage', 'Include storage').default(false),
-    new Option('-d, --includeDb', 'Include a database').default(false),
+    {
+      name: 'includeStorage',
+      message: 'Include storage',
+      schema: cliBoolean(),
+    },
+    {
+      name: 'includeDb',
+      message: 'Include a database',
+      schema: cliBoolean(),
+    },
   ]
 }
 
-export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, subcommandArgs: FullstackAWSProjectCommandOptions) => {
-  let includeStorage = subcommandArgs.includeStorage as boolean;
-  
-  if (includeStorage === undefined) {
+export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, args: FullstackAWSProjectCommandOptions) => {
+  let includeStorage;
+  if (args.includeStorage === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
         name: 'includeStorage',
         message: 'Include storage?',
+        initial: true,
       }
-    );  
+    );
 
-    includeStorage = answer.includeStorage;
+    args.includeStorage = answer.includeStorage;
+  } else {
+    includeStorage = args.includeStorage === 'true';
   }
 
-  let includeDb = subcommandArgs.includeDb as boolean;
-  if (includeDb === undefined) {
+  let includeDb;
+  if (args.includeDb === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
         name: 'includeDb',
         message: 'Include a database?',
+        initial: true,
       }
     );
 
     includeDb = answer.includeDb;
+  } else {
+    includeDb = args.includeDb === 'true';
   }
 
   return {
@@ -83,14 +91,10 @@ export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, 
 }
 
 export type FullstackAWSProjectOptions = {
-  includeStorage: boolean;
-  includeDb: boolean;
+  includeStorage: NullableCliOption;
+  includeDb: NullableCliOption;
 };
 
 export default function fullstackAWSProject(opts: FullstackAWSProjectOptions): Promise<string> {
-  const { includeStorage, includeDb } = opts;
-  return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), {
-    includeStorage,
-    includeDb,
-  });
+  return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), opts);
 }

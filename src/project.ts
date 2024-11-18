@@ -28,7 +28,12 @@ export type ProjectDependencyInfo = {
  * @template TOpts - The type of options that can be passed to the project methods.
  */
 export type LimgenProject<TOpts = unknown> = {
-  getCommandOptions(initArgs: any): Option[];
+  options(initArgs: { projectName: string; framework: import("./framework").FrameworkType; }): {
+    name: string;
+    message: string;
+    schema: any;
+  }[],
+
   /**
    * Renders a project template with the provided options.
    *
