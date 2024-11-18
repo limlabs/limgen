@@ -1,6 +1,7 @@
 import yargs from "yargs";
 import { promises as fs } from "fs";
 import { exec } from "child_process";
+import { Option } from "commander";
 
 /**
  * Represents the type of a project.
@@ -27,6 +28,7 @@ export type ProjectDependencyInfo = {
  * @template TOpts - The type of options that can be passed to the project methods.
  */
 export type LimgenProject<TOpts = unknown> = {
+  getCommandOptions(initArgs: any): Option[];
   /**
    * Renders a project template with the provided options.
    *
@@ -53,7 +55,7 @@ export type LimgenProject<TOpts = unknown> = {
   collectInput: (initArgs: {
     projectName: string;
     framework: string;
-  }, argv: typeof yargs['argv']) => Promise<TOpts>;
+  }, opts: any) => Promise<TOpts>;
 }
 
 /**

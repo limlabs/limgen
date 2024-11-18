@@ -1,4 +1,5 @@
 import { initOptionsSchema } from '@/commands/init';
+import { Option } from 'commander';
 import ejs from 'ejs';
 import path from 'path';
 import prompts from 'prompts';
@@ -35,8 +36,21 @@ export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   };
 }
 
-export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, argv: Record<string, unknown>) => {
-  let includeStorage = argv.includeStorage as boolean;
+export interface FullstackAWSProjectCommandOptions {
+  includeStorage: boolean;
+  includeDb: boolean;
+}
+
+export const getCommandOptions = () => {
+  return [
+    new Option('-s, --includeStorage', 'Include storage').default(false),
+    new Option('-d, --includeDb', 'Include a database').default(false),
+  ]
+}
+
+export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, subcommandArgs: FullstackAWSProjectCommandOptions) => {
+  let includeStorage = subcommandArgs.includeStorage as boolean;
+  
   if (includeStorage === undefined) {
     const answer = await prompts(
       {
@@ -49,7 +63,7 @@ export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, 
     includeStorage = answer.includeStorage;
   }
 
-  let includeDb = argv.includeDb as boolean;
+  let includeDb = subcommandArgs.includeDb as boolean;
   if (includeDb === undefined) {
     const answer = await prompts(
       {
