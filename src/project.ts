@@ -145,43 +145,6 @@ export interface ProjectTsConfigOptions {
 }
 
 /**
- * Generates a TypeScript configuration file (tsconfig.json) with predefined settings
- * and writes it to the 'infrastructure' directory.
- *
- * The generated tsconfig.json includes the following settings:
- * - compilerOptions:
- *   - baseUrl: "."
- *   - target: "ES6"
- *   - module: "commonjs"
- *   - strict: false
- *   - esModuleInterop: true
- *   - skipLibCheck: true
- *   - forceConsistentCasingInFileNames: true
- * - include: ["index.ts", "components/**\/*.ts", "utils/**\/*.ts"]
- * - exclude: ["node_modules", "dist"]
- *
- * @returns {Promise<void>} A promise that resolves when the file has been written.
- */
-export async function generateTSConfig(opts: ProjectTsConfigOptions) {
-  await ensureProjectFolder(opts.projectName);
-  const tsconfig = JSON.stringify({
-    "compilerOptions": {
-      "baseUrl": ".",
-      "target": "ES6",
-      "module": "commonjs",
-      "strict": false,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true
-    },
-    "include": ["index.ts", "components/**/*.ts", "utils/**/*.ts"],
-    "exclude": ["node_modules", "dist"]
-  }, null, 2)
-
-  await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'tsconfig.json'), tsconfig);
-}
-
-/**
  * Copies dependencies required for the project to the infrastructure directory.
  *
  * @param project - The LimgenProject instance for which dependencies are to be copied.

@@ -3,8 +3,8 @@ import { Command } from 'commander';
 import prompts from 'prompts';
 
 import { detectFramework, getSupportedProjectTypesForFramework, FrameworkType } from '@/framework';
-import { AllProjectTypes, copyFileDependencies, generateIndexFile, ProjectIndexFileOptions, generateProjectYaml, importProject, installDependencies, ProjectType, ProjectYamlOptions, generateTSConfig, ProjectTsConfigOptions } from '@/project';
-import { generatePackageJSON, initWorkspace } from '@/workspace';
+import { AllProjectTypes, copyFileDependencies, generateIndexFile, generateProjectYaml, importProject, installDependencies, ProjectType } from '@/project';
+import { generatePackageJSON, generateTSConfig, initWorkspace } from '@/workspace';
 import { parseProcessArgs } from '@/cli-helpers';
 import path from 'path';
 
@@ -93,7 +93,7 @@ export const init = new Command()
       copyFileDependencies(files),
       generateIndexFile(project, { projectOptions, projectName }),
       generatePackageJSON(),
-      generateTSConfig(initArgs),
+      generateTSConfig(),
       generateProjectYaml(initArgs),
     ])
 

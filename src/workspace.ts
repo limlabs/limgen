@@ -15,7 +15,7 @@ export const generateTSConfig = async () => {
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true
     },
-    "include": ["index.ts", "components/**/*.ts", "utils/**/*.ts"],
+    "include": ["index.ts", "components/**/*.ts", "projects/**/*.ts", "utils/**/*.ts"],
     "exclude": ["node_modules", "dist"]
   }, null, 2)
 
