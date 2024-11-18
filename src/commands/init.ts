@@ -3,9 +3,10 @@ import { Command } from 'commander';
 import prompts from 'prompts';
 
 import { detectFramework, getSupportedProjectTypesForFramework, FrameworkType } from '@/framework';
-import { AllProjectTypes, copyFileDependencies, generateIndexFile, generateProjectYaml, importProject, installDependencies, ProjectType } from '@/project';
+import { AllProjectTypes, copyFileDependencies, generateIndexFile, ProjectIndexFileOptions, generateProjectYaml, importProject, installDependencies, ProjectType, ProjectYamlOptions, generateTSConfig, ProjectTsConfigOptions } from '@/project';
 import { generatePackageJSON, initWorkspace } from '@/workspace';
 import { parseProcessArgs } from '@/cli-helpers';
+import path from 'path';
 
 export const initOptionsSchema = z.object({
   directory: z.string().optional(),
@@ -81,8 +82,8 @@ export const init = new Command()
     }
 
     const parsedOptions = schema.parse(processArgs);
-    const opts = await project.collectInput(initArgs, parsedOptions);
-    const { packages, files } = await project.dependsOn(opts);
+    const projectOptions = await project.collectInput(initArgs, parsedOptions);
+    const { packages, files } = await project.dependsOn(projectOptions);
 
     console.log('Initializing project...');
 
@@ -90,13 +91,14 @@ export const init = new Command()
 
     await Promise.all([
       copyFileDependencies(files),
-      generateIndexFile(project, opts),
+      generateIndexFile(project, { projectOptions, projectName }),
       generatePackageJSON(),
-      generateProjectYaml({ projectName }),
+      generateTSConfig(initArgs),
+      generateProjectYaml(initArgs),
     ])
 
     await installDependencies(packages);
 
     console.log('Project initialized successfully!');
-    console.log('To start working on your project, run `cd infrastructure && pulumi up`');
+    console.log(`To start working on your project, run \`cd ${path.join('infrastructure', initArgs.projectName)} && pulumi up\``);
   });

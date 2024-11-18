@@ -1,12 +1,12 @@
 
 import * as pulumi from "@pulumi/pulumi";
 
-import { VpcPublic } from "./components/vpc-public";
-import { LoadBalancerAlbPublic } from "./components/lb-alb-public";
-import { AppFargate } from "./components/app-fargate";
-import { CdnCloudFront } from "./components/cdn-cloudfront";<% if (includeDb) { %>
-import { PostgresRdsCluster } from "./components/db-postgres-rds";<% } %><% if (includeStorage) { %>
-import { StorageS3 } from "./components/storage-s3";<% } %>
+import { VpcPublic } from "../../components/vpc-public";
+import { LoadBalancerAlbPublic } from "../../components/lb-alb-public";
+import { AppFargate } from "../../components/app-fargate";
+import { CdnCloudFront } from "../../components/cdn-cloudfront";<% if (includeDb) { %>
+import { PostgresRdsCluster } from "../../components/db-postgres-rds";<% } %><% if (includeStorage) { %>
+import { StorageS3 } from "../../components/storage-s3";<% } %>
 
 const publicVpc = new VpcPublic;
 const lb = new LoadBalancerAlbPublic('LoadBalancer', {

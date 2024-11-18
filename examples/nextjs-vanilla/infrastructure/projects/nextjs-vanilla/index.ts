@@ -1,10 +1,10 @@
 
 import * as pulumi from "@pulumi/pulumi";
 
-import { VpcPublic } from "./components/vpc-public";
-import { LoadBalancerAlbPublic } from "./components/lb-alb-public";
-import { AppFargate } from "./components/app-fargate";
-import { CdnCloudFront } from "./components/cdn-cloudfront";
+import { VpcPublic } from "../../components/vpc-public";
+import { LoadBalancerAlbPublic } from "../../components/lb-alb-public";
+import { AppFargate } from "../../components/app-fargate";
+import { CdnCloudFront } from "../../components/cdn-cloudfront";
 
 const publicVpc = new VpcPublic;
 const lb = new LoadBalancerAlbPublic('LoadBalancer', {

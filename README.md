@@ -43,8 +43,6 @@ It is in theory possible, but untested, to add a Limgen workspace as a workspace
 
 ### Project
 
-**Note: coming soon! Currently only a single project is output into the `infrastructure` folder**
-
 A Pulumi infrastructure project with its own lifecycle.
 
 In Pulumi, each project has one or more "stacks", which is essentially its own environment.
@@ -108,12 +106,11 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 Must have:
 
-- [ ] Project directory
 - [ ] Add command
-- [ ] Documentation
 - [ ] Package publish
+- [ ] Documentation
 - [ ] Cloudfront --> S3 configuration
-- [ ] Private load balancer
+- [ ] Private networking option
 
 Like to have:
 
@@ -136,7 +133,3 @@ Help Wanted:
 - Storage Provider - Vercel
 - Storage Provider - Tigris
 - CDN Provider - Cloudflare
-
-Missing Test Coverage:
-
-- Deep Merge - used in pretty much all the components

@@ -183,7 +183,7 @@ export class AppFargate extends pulumi.ComponentResource {
 
     return new awsx.ecr.Image("Image", deepMerge({
       repositoryUrl: this.ecrRepository.url,
-      context: "..",
+      context: "../..",
       args: buildArgs,
       platform: "linux/amd64",
     }, this._args.imageArgs));

@@ -1,7 +1,6 @@
-import yargs from "yargs";
 import { promises as fs } from "fs";
 import { exec } from "child_process";
-import { Option } from "commander";
+import path from "path";
 
 /**
  * Represents the type of a project.
@@ -80,16 +79,33 @@ export async function importProject(projectType: ProjectType): Promise<LimgenPro
 }
 
 /**
+ * Initializes a project folder within the 'infrastructure' directory.
+ * Creates the directory recursively if it does not exist.
+ *
+ * @param projectName - The name of the project for which the folder is to be created.
+ * @returns A promise that resolves when the directory has been created.
+ */
+export async function ensureProjectFolder(projectName: string) {
+  await fs.mkdir(path.join('infrastructure', 'projects', projectName), { recursive: true });
+}
+
+export interface ProjectIndexFileOptions {
+  projectName: string;
+  projectOptions: any;
+}
+
+/**
  * Generates the index file for the given project.
  *
  * @param project - The LimgenProject instance for which the index file is to be generated.
  * @param opts - Options to be passed to the project's default method.
  * @returns A promise that resolves when the index file has been written.
  */
-export async function generateIndexFile(project: LimgenProject, opts: unknown) {
-  const result = await project.default(opts);
+export async function generateIndexFile(project: LimgenProject, opts: ProjectIndexFileOptions) {
+  await ensureProjectFolder(opts.projectName);
+  const result = await project.default(opts.projectOptions);
 
-  await fs.writeFile('infrastructure/index.ts', result);
+  await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'index.ts'), result);
 }
 
 /**
@@ -106,6 +122,7 @@ export interface ProjectYamlOptions {
  * @returns A promise that resolves when the project YAML file has been written.
  */
 export async function generateProjectYaml(opts: ProjectYamlOptions) {
+  await ensureProjectFolder(opts.projectName);
   const yaml = `
 
 name: ${opts.projectName}
@@ -120,7 +137,11 @@ config:
       pulumi:template: aws-typescript
   `.trimStart()
 
-  await fs.writeFile('infrastructure/Pulumi.yaml', yaml);
+  await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'Pulumi.yaml'), yaml);
+}
+
+export interface ProjectTsConfigOptions {
+  projectName: string
 }
 
 /**
@@ -141,7 +162,8 @@ config:
  *
  * @returns {Promise<void>} A promise that resolves when the file has been written.
  */
-export async function generateTSConfig() {
+export async function generateTSConfig(opts: ProjectTsConfigOptions) {
+  await ensureProjectFolder(opts.projectName);
   const tsconfig = JSON.stringify({
     "compilerOptions": {
       "baseUrl": ".",
@@ -156,7 +178,7 @@ export async function generateTSConfig() {
     "exclude": ["node_modules", "dist"]
   }, null, 2)
 
-  await fs.writeFile('infrastructure/tsconfig.json', tsconfig);
+  await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'tsconfig.json'), tsconfig);
 }
 
 /**
