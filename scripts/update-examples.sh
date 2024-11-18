@@ -19,3 +19,12 @@ pnpm dev init \
   --name nextjs-vanilla \
   --includeStorage=false \
   --includeDb=false
+
+echo "Updating express-vanilla..."
+rm -rf examples/express-vanilla/infrastructure
+pnpm dev init \
+  --directory examples/express-vanilla \
+  --projectType fullstack-aws \
+  --name express-vanilla \
+  --includeStorage=false \
+  --includeDb=false

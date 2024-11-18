@@ -140,6 +140,7 @@ Like to have:
 
 Help Wanted:
 
+- Read port automatically from Dockerfile
 - DB Provider - Prisma
 - DB Provider - Supabase
 - DB Provider - Vercel
@@ -148,6 +149,7 @@ Help Wanted:
 - App Provider - Fly.io
 - App Provider - Netlify
 - App Provider - Vercel
+- App Provider - Azure AKS
 - Storage Provider - Vercel
 - Storage Provider - Tigris
 - CDN Provider - Cloudflare
