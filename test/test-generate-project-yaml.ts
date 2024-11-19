@@ -10,7 +10,7 @@ describe('generateProjectYaml', async () => {
   test('should generate a Pulumi.yaml file', async () => {
     await generateProjectYaml({ projectName: 'my-project' });
 
-    const yaml = await fs.readFile('infrastructure/my-project/Pulumi.yaml', 'utf-8');
+    const yaml = await fs.readFile('infrastructure/projects/my-project/Pulumi.yaml', 'utf-8');
     assert.equal(yaml, `
 name: my-project
 description: A pulumi project created with limgen

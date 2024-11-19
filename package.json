@@ -1,6 +1,6 @@
 {
   "name": "limgen",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Infrastructure as Code generator",
   "bin": "./dist/bin/index.js",
   "engines": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "tsx src/bin/index.ts",
-    "test": "tsx --test --experimental-test-module-mocks  --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts",
+    "test": "rm -rf test/output && tsx --test --experimental-test-module-mocks  --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts",
     "build": "scripts/build.sh",
     "update-examples": "scripts/update-examples.sh"
   },

@@ -32,10 +32,12 @@ export const generatePackageJSON = async () => {
 export const generateCoreWorkspaceFiles = async () => {
   await fs.mkdir('infrastructure/utils', { recursive: true });
   await fs.mkdir('infrastructure/components', { recursive: true });
+  
   await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
 }
 
 export const renderWorkspace = async () => {
+  await generateCoreWorkspaceFiles();
   await initWorkspace();
   await generateTSConfig();
   await generatePackageJSON();

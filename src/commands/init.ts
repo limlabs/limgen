@@ -2,8 +2,8 @@ import z from 'zod';
 import { Command } from 'commander';
 import prompts from 'prompts';
 
-import { detectFramework, getSupportedProjectTypesForFramework, FrameworkType, renderFramework, AllFrameworkTypes, importFramework, Framework } from '@/framework';
-import { AllProjectTypes, importProject, LimgenProject, ProjectType, renderProject } from '@/project';
+import { detectFramework, FrameworkType, renderFramework, AllFrameworkTypes, importFramework, Framework } from '@/framework';
+import { AllProjectTypes, importProject, LimgenProject, renderProject } from '@/project';
 import { renderWorkspace } from '@/workspace';
 import { parseProcessArgs } from '@/cli-helpers';
 import path from 'path';

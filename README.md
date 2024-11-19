@@ -1,28 +1,27 @@
 # Limgen
 
-Limgen is an infrastructure-as-code (IaC) generator for full-stack applications. Inspired by @shadcn/ui, this tool aims to create maintainable infrastructure inside of your project. 
+Limgen is an infrastructure-as-code (IaC) generator for full-stack applications. Inspired by [@shadcn/ui](https://ui.shadcn.com/), this tool aims to create maintainable infrastructure inside of your project. 
 
-Unlike other tools, Limgen does not wrap your infrastructure in abstractions. We define a standard layout and components for you to use with Pulumi, a popular open-source IaC framework. This allows you to start with working code, and customize it to meet your applications' resource, security, and maintenance needs over time.
+Unlike other tools, Limgen does not wrap your infrastructure in abstractions. We define a standard layout and components for you to use with [Pulumi](https://www.pulumi.com/product/infrastructure-as-code/), a popular open-source IaC framework. This allows you to start with working code, and customize it to meet your applications' resource, security, and maintenance needs over time.
+
+## NextJS Quickstart
+
+```bash
+curl -fsSL https://get.pulumi.com | sh # install latest version of pulumi (optional)
+npx create-next-app # create a new next app (optional)
+cd create-next-app # enter your next project directory
+npx limgen init # run the project init subcommand
+cd infrastructure/your-project && pulumi up # create your new fullstack application!
+```
 
 ## Usage
 
-Eventually this will be published as a package on NPM. For now, this project is under active development and can be used by linking:
-
-1. Clone this repo
-1. Run `pnpm install`
-1. Run `pnpm build`
-1. Run `pnpm link --global`
-
-Now you should be able to run `limgen --help` and get stuff back. Yay!
-
-Each time you need to make an update, make sure to run `pnpm build`. You do not need to re-link after linking once.
-
+`npx limgen [subcommand]`
 
 ### Available subcommands
 
-- `init` - Initializes a new project from (eventually) one of several project types. Right now the only supported project type is `fullstack-aws`. Creates a workspace if it doesn't already exist
-- `add` (coming soon) - Adds a new component to the workspace
-
+- `init` - Initializes a new project from (eventually) one of several project types. Right now the only supported project type is `fullstack-aws`. Creates a workspace if it doesn't already exist.
+- `add <component>` - Adds a new component to the `infrastructure/components` folder. Components are usually imported into one or more projects inside the `infrastructure/projects` folder.
 
 ## Concepts
 
@@ -124,8 +123,6 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 Must have:
 
-- [ ] Add command
-- [ ] Package publish
 - [ ] Documentation
 - [ ] Cloudfront --> S3 configuration
 - [ ] Private networking option

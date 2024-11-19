@@ -2,6 +2,7 @@
 
 import { program } from 'commander';
 import { init } from '@/commands/init';
+import { add } from '@/commands/add';
 
 // Handle Ctrl+C even when raw mode is used (for prompts)
 process.stdin.on("keypress", function (_chunk, key) {
@@ -12,4 +13,5 @@ process.stdin.on("keypress", function (_chunk, key) {
 });
 
 program.addCommand(init);
+program.addCommand(add);
 program.parseAsync();
