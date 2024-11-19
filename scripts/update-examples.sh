@@ -3,7 +3,7 @@
 set -e
 
 echo "Updating nextjs-fullstack..."
-rm -rf examples/nextjs-fullstack/infrastructure examples/nextjs-fullstack/Dockerfile
+rm -rf examples/nextjs-fullstack/infrastructure
 pnpm dev init \
   --directory examples/nextjs-fullstack \
   --projectType fullstack-aws \
