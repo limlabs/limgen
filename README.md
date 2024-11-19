@@ -2,17 +2,29 @@
 
 Limgen is an infrastructure-as-code (IaC) generator for full-stack applications. Inspired by [@shadcn/ui](https://ui.shadcn.com/), this tool aims to create maintainable infrastructure inside of your project. 
 
-Unlike other tools, Limgen does not wrap your infrastructure in abstractions. We define a standard layout and components for you to use with [Pulumi](https://www.pulumi.com/product/infrastructure-as-code/), a popular open-source IaC framework. This allows you to start with working code, and customize it to meet your applications' resource, security, and maintenance needs over time.
+Unlike other shared IaC tools, Limgen is not a library. You cannot install it to your project with NPM. 
+
+Instead, Limgen defines a standard layout and components for you to use with [Pulumi](https://www.pulumi.com/product/infrastructure-as-code/), a popular open-source IaC framework. The `limgen` CLI generates working code into your repository, with the flexibility to customize it to meet your applications' resource, security, and maintenance needs over time.
 
 ## NextJS Quickstart
 
+To initialize an existing Next.js app with limgen, follow these steps:
+
 ```bash
-curl -fsSL https://get.pulumi.com | sh # install latest version of pulumi (optional)
-npx create-next-app # create a new next app (optional)
-cd create-next-app # enter your next project directory
-npx limgen init # run the project init subcommand
-cd infrastructure/your-project && pulumi up # create your new fullstack application!
+# install latest version of pulumi if you don't already have it
+curl -fsSL https://get.pulumi.com | sh 
+
+# 1. enter your next project directory
+cd my-app
+
+# 2. run the init command
+npx limgen init
+
+# 3. Deploy your new fullstack application!
+cd infrastructure/your-project && pulumi up 
 ```
+
+Note that you may need to install additional tools, such as the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), when using providers that require cloud-specific authentication.
 
 ## Usage
 
