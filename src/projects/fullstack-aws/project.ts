@@ -4,6 +4,8 @@ import ejs from 'ejs';
 import path from 'path';
 import prompts from 'prompts';
 import z from 'zod';
+import fs from 'fs/promises';
+import { fileExists } from '@/files';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   const files: string[] = [
@@ -56,9 +58,9 @@ export const inputs = async () => {
   ]
 }
 
-export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, projectArgs: any) => {
+export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, projectInputs: any) => {
   let includeStorage;
-  if (projectArgs.includeStorage === 'unknown') {
+  if (projectInputs.includeStorage === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
@@ -68,13 +70,13 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
       }
     );
 
-    projectArgs.includeStorage = answer.includeStorage;
+    projectInputs.includeStorage = answer.includeStorage;
   } else {
-    includeStorage = projectArgs.includeStorage === 'true';
+    includeStorage = projectInputs.includeStorage === 'true';
   }
 
   let includeDb;
-  if (projectArgs.includeDb === 'unknown') {
+  if (projectInputs.includeDb === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
@@ -86,13 +88,13 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
 
     includeDb = answer.includeDb;
   } else {
-    includeDb = projectArgs.includeDb === 'true';
+    includeDb = projectInputs.includeDb === 'true';
   }
 
   return {
     includeStorage,
     includeDb,
-    port: projectArgs.port,
+    port: projectInputs.port,
   };
 }
 
@@ -101,6 +103,35 @@ export type FullstackAWSProjectOptions = {
   includeDb: boolean;
 };
 
-export default function fullstackAWSProject(inputs: FullstackAWSProjectOptions): Promise<string> {
+export default async function fullstackAWSProject(inputs: FullstackAWSProjectOptions): Promise<string> {
+  const [indexContents] = await Promise.all([
+    renderIndex(inputs),
+    updateDockerignore(),
+  ]);
+
+  return indexContents;
+}
+
+const updateDockerignore = async () => {
+  if (await fileExists('.dockerignore')) {
+    // see if infrastructure is already in the .dockerignore file
+    const dockerignore = await fs.readFile('.dockerignore', 'utf-8');
+    if (!dockerignore.includes('infrastructure')) {
+      await fs.appendFile('.dockerignore', '\ninfrastructure\n');
+    }
+  } else {
+    await fs.writeFile('.dockerignore', `
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+infrastructure/`.trim());
+  }
+}
+
+export const renderIndex = async (inputs: FullstackAWSProjectOptions) => {
   return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), inputs);
 }

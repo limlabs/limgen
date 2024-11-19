@@ -1,5 +1,5 @@
 import test, { describe } from 'node:test';
-import fullstackAWSProject, { FullstackAWSProjectOptions } from '@/projects/fullstack-aws/project';
+import fullstackAWSProject, { FullstackAWSProjectOptions, renderIndex } from '@/projects/fullstack-aws/project';
 import assert from 'node:assert';
 
 describe('fullstackAWSProject', () => {
@@ -8,7 +8,7 @@ describe('fullstackAWSProject', () => {
       includeStorage: false,
       includeDb: false,
     };
-    const template = await fullstackAWSProject(opts);
+    const template = await renderIndex(opts);
     assert(!template.includes('import { StorageS3 }'));
     assert(!template.includes('import { PostgresRdsCluster }'));
     assert(!template.includes('const storage = new StorageS3;'));
@@ -19,7 +19,7 @@ describe('fullstackAWSProject', () => {
       includeStorage: true,
       includeDb: false,
     };
-    const template = await fullstackAWSProject(opts);
+    const template = await renderIndex(opts);
     assert.ok(template.includes('import { StorageS3 }'));
     assert.ok(template.includes('const storage = new StorageS3;'));
     assert.ok(template.includes('const cdn = new CdnCloudFront'));
@@ -35,7 +35,7 @@ describe('fullstackAWSProject', () => {
       includeStorage: false,
       includeDb: true,
     };
-    const template = await fullstackAWSProject(opts);
+    const template = await renderIndex(opts);
     assert.ok(template.includes('import { PostgresRdsCluster }'));
     assert.ok(template.includes('const db = new PostgresRdsCluster'));
     assert.ok(template.includes('connectionStringSecret: db.connectionStringSecret,'));
@@ -51,7 +51,7 @@ describe('fullstackAWSProject', () => {
       includeStorage: true,
       includeDb: true,
     };
-    const template = await fullstackAWSProject(opts);
+    const template = await renderIndex(opts);
     assert.ok(template.includes('import { StorageS3 }'));
     assert.ok(template.includes('const storage = new StorageS3;'));
     assert.ok(template.includes('storage: storage.bucket,'));

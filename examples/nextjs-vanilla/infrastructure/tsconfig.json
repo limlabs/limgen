@@ -9,7 +9,6 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "index.ts",
     "components/**/*.ts",
     "projects/**/*.ts",
     "utils/**/*.ts"

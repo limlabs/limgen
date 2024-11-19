@@ -12,7 +12,7 @@ pnpm dev init \
   --includeDb
 
 echo "Updating nextjs-vanilla..."
-rm -rf examples/nextjs-vanilla/infrastructure examples/nextjs-vanilla/Dockerfile
+rm -rf examples/nextjs-vanilla/infrastructure examples/nextjs-vanilla/Dockerfile examples/nextjs-vanilla/.dockerignore
 pnpm dev init \
   --directory examples/nextjs-vanilla \
   --projectType fullstack-aws \

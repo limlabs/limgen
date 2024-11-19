@@ -34,8 +34,17 @@ export interface NextJSFrameworkInput {
 export default async function nextJsFramework(opts: NextJSFrameworkInput) {
   await Promise.all([
     ensureDockerfile(opts),
-    updateNextConfig()
+    updateNextConfig(),
+    updateDockerignore()
   ])
+}
+
+const updateDockerignore = async () => {
+  const contents = await fs.readFile('.dockerignore', 'utf-8');
+  if (!contents.includes('node_modules')) {
+    await fs.appendFile('.dockerignore', 'node_modules\n');
+    console.log('Updated .dockerignore with node_modules');
+  }
 }
 
 const ensureDockerfile = async (opts: NextJSFrameworkInput) => {
