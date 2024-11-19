@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { fileExists } from './files';
 
 export const initWorkspace = async () => {
   await fs.mkdir('infrastructure', { recursive: true });
@@ -36,9 +37,25 @@ export const generateCoreWorkspaceFiles = async () => {
   await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
 }
 
+export const addGitignore = async () => {
+  if (!(await fileExists('infrastructure/.gitignore'))) {
+    return;
+  }
+
+  const gitignore = `
+node_modules
+
+`.trimStart();
+
+  await fs.writeFile('infrastructure/.gitignore', gitignore);
+}
+
 export const renderWorkspace = async () => {
-  await generateCoreWorkspaceFiles();
   await initWorkspace();
-  await generateTSConfig();
-  await generatePackageJSON();
+  await Promise.all([
+    generateCoreWorkspaceFiles(),
+    generateTSConfig(),
+    generatePackageJSON(),
+    addGitignore()
+  ]);
 }
