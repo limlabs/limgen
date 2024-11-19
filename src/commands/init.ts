@@ -2,9 +2,9 @@ import z from 'zod';
 import { Command } from 'commander';
 import prompts from 'prompts';
 
-import { detectFramework, getSupportedProjectTypesForFramework, FrameworkType } from '@/framework';
-import { AllProjectTypes, copyFileDependencies, generateIndexFile, generateProjectYaml, importProject, installDependencies, ProjectType } from '@/project';
-import { generatePackageJSON, generateTSConfig, initWorkspace } from '@/workspace';
+import { detectFramework, getSupportedProjectTypesForFramework, FrameworkType, renderFramework, AllFrameworkTypes, importFramework, Framework } from '@/framework';
+import { AllProjectTypes, importProject, LimgenProject, ProjectType, renderProject } from '@/project';
+import { renderWorkspace } from '@/workspace';
 import { parseProcessArgs } from '@/cli-helpers';
 import path from 'path';
 
@@ -24,81 +24,122 @@ export const init = new Command()
   .option('-t, --projectType <type>', 'Type of project to create')
   .option('-f, --framework <framework>', 'Framework to use')
   .action(async (options) => {
-    const parsedInitOptions = initOptionsSchema.parse(options);
+    const cmdArgs = initOptionsSchema.parse(options);
 
-    if (parsedInitOptions.directory) {
-      process.chdir(parsedInitOptions.directory);
+    if (cmdArgs.directory) {
+      process.chdir(cmdArgs.directory);
     }
 
-    let projectName: string = parsedInitOptions.name as string;
-    if (!projectName) {
-      const result = await prompts({
-        type: 'text',
-        name: 'projectName',
-        message: 'Enter a project name',
-        initial: 'my-project',
-      });
-
-      projectName = result.projectName;
+    let frameworkType = cmdArgs.framework as FrameworkType;
+    if (!frameworkType) {
+      frameworkType = await detectFramework();
     }
 
-    let framework = parsedInitOptions.framework as FrameworkType;
-    if (!framework) {
-      framework = await detectFramework();
-    }
+    await renderWorkspace();
 
-    let projectType = parsedInitOptions.projectType as ProjectType;
-    if (!projectType) {
-      const supportedProjectTypes = await getSupportedProjectTypesForFramework(framework);
-
-      const answer = await prompts({
-        type: 'select',
-        name: 'projectType',
-        message: 'Select a project type',
-        choices: AllProjectTypes.map((type) => ({
-          title: `${type}${type === supportedProjectTypes[0] ? ' (Recommended)' : ''}`,
-          value: type,
-        })),
-      });
-
-      projectType = answer.projectType;
-    }
-
-    // import the project dynamically
-    const initArgs = { projectName, framework };
+    let projectType = await getProjectType(cmdArgs);
     const project = await importProject(projectType);
-    const cmdOpts = await project.options(initArgs);
-
-    const schema = z.object(cmdOpts.reduce((acc, opt) => {
-      acc[opt.name] = opt.schema;
-      return acc;
-    }, {} as any));
-
-    const processArgs = parseProcessArgs();
-    for (const opt of cmdOpts) {
-      if (processArgs[opt.name] === undefined) {
-        processArgs[opt.name] = 'unknown';
-      }
-    }
-
-    const parsedOptions = schema.parse(processArgs);
-    const projectOptions = await project.collectInput(initArgs, parsedOptions);
-    const { packages, files } = await project.dependsOn(projectOptions);
+    const projectInputs = await collectProjectInputs(project, cmdArgs, frameworkType);
 
     console.log('Initializing project...');
+    await renderProject(project, projectInputs);
 
-    await initWorkspace();
-
-    await Promise.all([
-      copyFileDependencies(files),
-      generateIndexFile(project, { projectOptions, projectName }),
-      generatePackageJSON(),
-      generateTSConfig(),
-      generateProjectYaml(initArgs),
-    ])
-
-    await installDependencies(packages);
+    if (AllFrameworkTypes.includes(frameworkType) && frameworkType !== 'unknown') {
+      console.log(`Detected framework: ${frameworkType}, initializing...`);
+      const framework = await importFramework(frameworkType);
+      const frameworkInputs = await collectFrameworkInputs(framework, cmdArgs, projectInputs);
+      await renderFramework(framework, frameworkInputs);
+    }
 
     console.log('Project initialized successfully!');
-    console.log(`To start working on your project, run \`cd ${path.join('infrastructure', 'projects', initArgs.projectName)} && pulumi up\``);
+    console.log(`To start working on your project, run \`cd ${path.join('infrastructure', 'projects', projectInputs.projectName)} && pulumi up\``);
   });
+
+export async function getProjectType(cmdArgs: z.infer<typeof initOptionsSchema>) {
+  if (cmdArgs.projectType) {
+    return cmdArgs.projectType;
+  }
+
+  const answer = await prompts({
+    type: 'select',
+    name: 'projectType',
+    message: 'Select a project type',
+    choices: AllProjectTypes.map((type) => ({ title: type, value: type })),
+  });
+
+  return answer.projectType;
+}
+
+
+export async function collectProjectInputs(project: LimgenProject, cmdArgs: any, framework: FrameworkType) {
+  const projectInput = await project.inputs(cmdArgs);
+  const schema = projectInput.reduce((acc, opt) => {
+    acc[opt.name] = opt.schema;
+    return acc;
+  }, {} as any);
+
+  const processArgs = parseProcessArgs();
+  for (const opt of projectInput) {
+    if (processArgs[opt.name] === undefined) {
+      processArgs[opt.name] = 'unknown';
+    }
+  }
+
+  let projectName: string = cmdArgs.name as string;
+  if (!projectName) {
+    const result = await prompts({
+      type: 'text',
+      name: 'projectName',
+      message: 'Enter a project name',
+      initial: 'my-project',
+    });
+
+    projectName = result.projectName;
+  }
+
+  let projectType = cmdArgs.projectType as ProjectType;
+  if (!projectType) {
+    const supportedProjectTypes = await getSupportedProjectTypesForFramework(framework);
+
+    const answer = await prompts({
+      type: 'select',
+      name: 'projectType',
+      message: 'Select a project type',
+      choices: AllProjectTypes.map((type) => ({
+        title: `${type}${type === supportedProjectTypes[0] ? ' (Recommended)' : ''}`,
+        value: type,
+      })),
+    });
+
+    projectType = answer.projectType;
+  }
+
+  const projectArgs = z.object(schema).parse(processArgs);
+  const inputs = await project.collectInput(cmdArgs, projectArgs) as Object;
+
+  return {
+    projectName,
+    projectType,
+    ...inputs,
+  };
+}
+
+export async function collectFrameworkInputs(framework: Framework, cmdArgs: any, projectInput: any) {
+  const frameworkInput = await framework.inputs(cmdArgs, projectInput);
+  const schema = frameworkInput.reduce((acc, opt) => {
+    acc[opt.name] = opt.schema;
+    return acc;
+  }, {} as any);
+
+  const processArgs = parseProcessArgs();
+
+  for (const opt of frameworkInput) {
+    if (processArgs[opt.name] === undefined) {
+      processArgs[opt.name] = 'unknown';
+    }
+  }
+
+  const frameworkArgs = z.object(schema).parse(processArgs);
+  const inputs = await framework.collectInput(cmdArgs, projectInput, frameworkArgs) as Object;
+  return inputs;
+}

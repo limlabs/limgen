@@ -1,6 +1,9 @@
 import { promises as fs } from "fs";
 import { exec } from "child_process";
 import path from "path";
+import { generatePackageJSON, generateTSConfig } from "./workspace";
+import { copyFileDependencies } from "./files";
+import { installDependencies } from "./npm";
 
 /**
  * Represents the type of a project.
@@ -27,7 +30,7 @@ export type ProjectDependencyInfo = {
  * @template TOpts - The type of options that can be passed to the project methods.
  */
 export type LimgenProject<TOpts = unknown> = {
-  options(initArgs: { projectName: string; framework: import("./framework").FrameworkType; }): {
+  inputs(initArgs: { name: string; }): {
     name: string;
     message: string;
     schema: any;
@@ -58,7 +61,6 @@ export type LimgenProject<TOpts = unknown> = {
    */
   collectInput: (initArgs: {
     projectName: string;
-    framework: string;
   }, opts: any) => Promise<TOpts>;
 }
 
@@ -75,7 +77,7 @@ export const AllProjectTypes = ['fullstack-aws'] as const;
  * @returns A promise that resolves to the imported project module.
  */
 export async function importProject(projectType: ProjectType): Promise<LimgenProject> {
-  return await import(`./projects/${projectType}`);
+  return await import(`./projects/${projectType}/project`);
 }
 
 /**
@@ -91,7 +93,7 @@ export async function ensureProjectFolder(projectName: string) {
 
 export interface ProjectIndexFileOptions {
   projectName: string;
-  projectOptions: any;
+  inputs: any;
 }
 
 /**
@@ -101,11 +103,11 @@ export interface ProjectIndexFileOptions {
  * @param opts - Options to be passed to the project's default method.
  * @returns A promise that resolves when the index file has been written.
  */
-export async function generateIndexFile(project: LimgenProject, opts: ProjectIndexFileOptions) {
-  await ensureProjectFolder(opts.projectName);
-  const result = await project.default(opts.projectOptions);
+export async function generateIndexFile(project: LimgenProject, inputs: any) {
+  await ensureProjectFolder(inputs.projectName);
+  const result = await project.default(inputs);
 
-  await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'index.ts'), result);
+  await fs.writeFile(path.join('infrastructure', 'projects', inputs.projectName, 'index.ts'), result);
 }
 
 /**
@@ -140,39 +142,14 @@ config:
   await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'Pulumi.yaml'), yaml);
 }
 
-export interface ProjectTsConfigOptions {
-  projectName: string
-}
+export async function renderProject(project: LimgenProject, inputs: any) {
+  const { packages, files } = await project.dependsOn(inputs);
 
-/**
- * Copies dependencies required for the project to the infrastructure directory.
- *
- * @param project - The LimgenProject instance for which dependencies are to be copied.
- * @param opts - Options to be passed to the project's dependsOn method.
- * @returns A promise that resolves when the dependencies have been copied.
- */
-export async function copyFileDependencies(files: string[]) {
-  await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
-  await fs.mkdir('infrastructure/components', { recursive: true });
-  for (const dep of files) {
-    await fs.copyFile(`${__dirname}/${dep}`, `infrastructure/${dep}`);
-  }
-}
-
-/**
- * Installs the specified npm packages as dependencies in the 'infrastructure' directory.
- *
- * @param packages - An array of package names to install.
- * @returns A promise that resolves with the standard output of the npm install command, or rejects with an error.
- */
-export async function installDependencies(packages: string[]) {
-  return new Promise((resolve, reject) => {
-    exec(`npm install --save ${packages.join(' ')}`, { cwd: 'infrastructure' }, (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout);
-      }
-    });
-  });
+  await Promise.all([
+    copyFileDependencies(files),
+    generateIndexFile(project, inputs),
+    generatePackageJSON().then(() => installDependencies(packages)),
+    generateTSConfig(),
+    generateProjectYaml(inputs),
+  ])
 }

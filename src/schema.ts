@@ -8,3 +8,12 @@ export const cliBoolean = () => z.enum(['true', 'false', 'unknown'])
       ['true', 'false'].includes(val)
       ? val
       : 'unknown');
+
+export const cliInteger = () => z.string().refine((val) => {
+  const parsed = parseInt(val);
+  if (isNaN(parsed)) {
+    return -1;
+  }
+
+  return parsed;
+});

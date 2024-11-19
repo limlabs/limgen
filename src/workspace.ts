@@ -28,3 +28,15 @@ export const generatePackageJSON = async () => {
     version: '1.0.0'
   }, null, 2));
 }
+
+export const generateCoreWorkspaceFiles = async () => {
+  await fs.mkdir('infrastructure/utils', { recursive: true });
+  await fs.mkdir('infrastructure/components', { recursive: true });
+  await fs.cp(`${__dirname}/utils`, 'infrastructure/utils', { recursive: true });
+}
+
+export const renderWorkspace = async () => {
+  await initWorkspace();
+  await generateTSConfig();
+  await generatePackageJSON();
+}

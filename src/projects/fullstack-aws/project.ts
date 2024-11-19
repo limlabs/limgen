@@ -1,5 +1,5 @@
 import { initOptionsSchema } from '@/commands/init';
-import { cliBoolean, NullableCliOption } from '@/schema';
+import { cliBoolean, cliInteger, NullableCliOption } from '@/schema';
 import ejs from 'ejs';
 import path from 'path';
 import prompts from 'prompts';
@@ -36,7 +36,7 @@ export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   };
 }
 
-export const options = async () => {
+export const inputs = async () => {
   return [
     {
       name: 'includeStorage',
@@ -48,12 +48,17 @@ export const options = async () => {
       message: 'Include a database',
       schema: cliBoolean(),
     },
+    {
+      name: 'port',
+      message: 'Port to expose',
+      schema: cliInteger().optional().default('3000'),
+    }
   ]
 }
 
-export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, args: any) => {
+export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, projectArgs: any) => {
   let includeStorage;
-  if (args.includeStorage === 'unknown') {
+  if (projectArgs.includeStorage === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
@@ -63,13 +68,13 @@ export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, 
       }
     );
 
-    args.includeStorage = answer.includeStorage;
+    projectArgs.includeStorage = answer.includeStorage;
   } else {
-    includeStorage = args.includeStorage === 'true';
+    includeStorage = projectArgs.includeStorage === 'true';
   }
 
   let includeDb;
-  if (args.includeDb === 'unknown') {
+  if (projectArgs.includeDb === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
@@ -81,12 +86,13 @@ export const collectInput = async (initArgs: z.infer<typeof initOptionsSchema>, 
 
     includeDb = answer.includeDb;
   } else {
-    includeDb = args.includeDb === 'true';
+    includeDb = projectArgs.includeDb === 'true';
   }
 
   return {
     includeStorage,
     includeDb,
+    port: projectArgs.port,
   };
 }
 
@@ -95,6 +101,6 @@ export type FullstackAWSProjectOptions = {
   includeDb: boolean;
 };
 
-export default function fullstackAWSProject(opts: FullstackAWSProjectOptions): Promise<string> {
-  return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), opts);
+export default function fullstackAWSProject(inputs: FullstackAWSProjectOptions): Promise<string> {
+  return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), inputs);
 }

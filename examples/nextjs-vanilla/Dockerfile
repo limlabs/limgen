@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
-
 FROM node:20-alpine AS base
+ARG INPUT_CDN_URL
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -20,6 +20,8 @@ RUN \
 
 # Rebuild the source code only when needed
 FROM base AS builder
+
+ENV CDN_URL=${INPUT_CDN_URL}
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -38,9 +40,11 @@ RUN \
 
 # Production image, copy all the files and run next
 FROM base AS runner
+
 WORKDIR /app
 
 ENV NODE_ENV=production
+
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -67,4 +71,5 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+
+CMD ["sh", "-c", "node server.js"]
