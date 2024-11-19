@@ -1,5 +1,5 @@
-import { initOptionsSchema } from '@/commands/init';
-import { cliBoolean, cliInteger, NullableCliOption } from '@/schema';
+import { initOptionsSchema } from '../../commands/init';
+import { cliBoolean, cliInteger } from '../../schema';
 import ejs from 'ejs';
 import path from 'path';
 import prompts from 'prompts';

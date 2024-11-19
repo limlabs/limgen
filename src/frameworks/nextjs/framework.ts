@@ -1,5 +1,5 @@
-import { dockerfileExists, getDockerfilePort } from "@/docker";
-import { cliInteger } from "@/schema";
+import { dockerfileExists, getDockerfilePort } from "../../docker";
+import { cliInteger } from "../../schema";
 import ejs from "ejs";
 import fs from "fs/promises";
 
