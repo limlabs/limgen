@@ -1,11 +1,11 @@
-import { initOptionsSchema } from '../../commands/init';
-import { cliBoolean, cliInteger } from '../../schema';
 import ejs from 'ejs';
 import path from 'path';
 import prompts from 'prompts';
 import z from 'zod';
 import fs from 'fs/promises';
-import { fileExists } from '@/files';
+import { initOptionsSchema } from '../../commands/init';
+import { cliBoolean, cliInteger } from '../../schema';
+import { fileExists } from '../../files';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   const files: string[] = [
