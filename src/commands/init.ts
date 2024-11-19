@@ -37,7 +37,7 @@ export const init = new Command()
 
     await renderWorkspace();
 
-    let projectType = await getProjectType(cmdArgs);
+    const projectType = await getProjectType(cmdArgs);
     const project = await importProject(projectType);
     const projectInputs = await collectProjectInputs(project, cmdArgs, frameworkType);
 
@@ -97,29 +97,13 @@ export async function collectProjectInputs(project: LimgenProject, cmdArgs: any,
     projectName = result.projectName;
   }
 
-  let projectType = cmdArgs.projectType as ProjectType;
-  if (!projectType) {
-    const supportedProjectTypes = await getSupportedProjectTypesForFramework(framework);
-
-    const answer = await prompts({
-      type: 'select',
-      name: 'projectType',
-      message: 'Select a project type',
-      choices: AllProjectTypes.map((type) => ({
-        title: `${type}${type === supportedProjectTypes[0] ? ' (Recommended)' : ''}`,
-        value: type,
-      })),
-    });
-
-    projectType = answer.projectType;
-  }
 
   const projectArgs = z.object(schema).parse(processArgs);
   const inputs = await project.collectInput(cmdArgs, projectArgs) as Object;
 
   return {
     projectName,
-    projectType,
+    projectType: cmdArgs.projectType,
     ...inputs,
   };
 }
