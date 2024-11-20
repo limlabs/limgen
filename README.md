@@ -227,14 +227,13 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 Must have:
 
-- Loading spinner
-- Set port in 
-- [ ] Documentation
+- [ ] Set port in service
 - [ ] Cloudfront --> S3 configuration
 - [ ] Private networking option
 
 Like to have:
 
+- Improve default project name
 - Static site aws project
 - NextJS static site example
 - Resource - Bastion

@@ -1,12 +1,12 @@
 import z from 'zod';
 import { Command } from 'commander';
 import prompts from 'prompts';
+import path from 'path';
 
 import { detectFramework, FrameworkType, renderFramework, AllFrameworkTypes, importFramework, Framework } from '@/framework';
 import { AllProjectTypes, importProject, LimgenProject, renderProject } from '@/project';
 import { renderWorkspace } from '@/workspace';
-import { parseProcessArgs } from '@/cli-helpers';
-import path from 'path';
+import { bold, colorize, parseProcessArgs, spinner } from '@/cli-helpers';
 
 export const initOptionsSchema = z.object({
   directory: z.string().optional(),
@@ -41,18 +41,25 @@ export const init = new Command()
     const project = await importProject(projectType);
     const projectInputs = await collectProjectInputs(project, cmdArgs, frameworkType);
 
-    console.log('Initializing project...');
+    const projectSpinner = spinner(`Initializing project type ${colorize('yellow', projectType)}`).start();
+
     await renderProject(project, projectInputs);
 
+    projectSpinner.succeed();
+
     if (AllFrameworkTypes.includes(frameworkType) && frameworkType !== 'unknown') {
-      console.log(`Detected framework: ${frameworkType}, initializing...`);
+      const frameworkSpinner = spinner(`Intializing framework ${colorize('yellow', frameworkType)}`).start();
+
       const framework = await importFramework(frameworkType);
       const frameworkInputs = await collectFrameworkInputs(framework, cmdArgs, projectInputs);
       await renderFramework(framework, frameworkInputs);
+
+      frameworkSpinner.succeed();
     }
 
-    console.log('Project initialized successfully!');
-    console.log(`To start working on your project, run \`cd ${path.join('infrastructure', 'projects', projectInputs.projectName)} && pulumi up\``);
+    const cmdToRun = `(cd ${path.join('infrastructure', 'projects', projectInputs.projectName)} && pulumi up)`;
+    console.log(`🤸 Project ${colorize('cyan', projectInputs.projectName)} initialized successfully! 🤸\n`);
+    console.log(`To deploy your resources, run ${bold(cmdToRun)}\n`);
   });
 
 export async function getProjectType(cmdArgs: z.infer<typeof initOptionsSchema>) {

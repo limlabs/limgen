@@ -43,7 +43,6 @@ const updateDockerignore = async () => {
   const contents = await fs.readFile('.dockerignore', 'utf-8');
   if (!contents.includes('node_modules')) {
     await fs.appendFile('.dockerignore', 'node_modules\n');
-    console.log('Updated .dockerignore with node_modules');
   }
 }
 
@@ -55,7 +54,6 @@ const ensureDockerfile = async (opts: NextJSFrameworkInput) => {
   try {
     const result = await ejs.renderFile(`${__dirname}/Dockerfile.ejs.t`, opts)
     await fs.writeFile('Dockerfile', result)
-    console.log('Created Dockerfile')
   } catch (error) {
     console.error('Unable to render Dockerfile', error)
     throw error
@@ -85,7 +83,6 @@ const updateNextConfig = async () => {
       );
 
       await fs.writeFile(nextConfigFile, updatedNextConfig);
-      console.log(`Updated ${nextConfigFile} with output: 'standalone'`);
     } else if (outputMatch[2] !== 'standalone') {
       throw new Error(
         'Your NextJS config `output` property is not set to standalone.' +
