@@ -58,7 +58,7 @@ export const init = new Command()
     }
 
     const cmdToRun = `(cd ${path.join('infrastructure', 'projects', projectInputs.projectName)} && pulumi up)`;
-    console.log(`🤸 Project ${colorize('cyan', projectInputs.projectName)} initialized successfully! 🤸\n`);
+    console.log(bold(`\n🤸 Project ${colorize('cyan', projectInputs.projectName)} initialized successfully! 🤸\n`));
     console.log(`To deploy your resources, run ${bold(cmdToRun)}\n`);
   });
 
