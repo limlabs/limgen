@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import { prefixed } from "../utils/prefixed";
-import { deepMerge } from "../utils/deep-merge";
+import { deepMerge, RecursivePartial } from "../utils/deep-merge";
 
 export interface FullstackServiceAWSArgs {
   cdnHostname?: pulumi.Input<string>;
@@ -20,6 +20,7 @@ export interface FullstackServiceAWSArgs {
   imageArgs?: awsx.ecr.ImageArgs;
   serviceArgs?: awsx.ecs.FargateServiceArgs;
   loadBalancer?: awsx.lb.ApplicationLoadBalancer;
+  taskDefinitionArgs?: RecursivePartial<awsx.ecs.FargateTaskDefinitionArgs>;
 }
 
 export const defaultFullstackServiceAWSArgs: FullstackServiceAWSArgs = {
@@ -33,6 +34,7 @@ export const defaultFullstackServiceAWSArgs: FullstackServiceAWSArgs = {
   taskRole: null as any,
   executionRole: null as any,
   ecrRepository: null as any,
+  taskDefinitionArgs: null as any,
 };
 
 export class AppFargate extends pulumi.ComponentResource {
@@ -45,6 +47,7 @@ export class AppFargate extends pulumi.ComponentResource {
   image: awsx.ecr.Image;
   service: awsx.ecs.FargateService;
   securityGroupIds: (string|pulumi.Output<string>)[];
+  taskDefinitionArgs: awsx.ecs.FargateTaskDefinitionArgs;
 
   constructor(name: string = 'App', args: FullstackServiceAWSArgs, opts?: pulumi.ComponentResourceOptions) {
     super("limgen:EcsClusterComponent", name, {}, opts);
@@ -55,9 +58,27 @@ export class AppFargate extends pulumi.ComponentResource {
     this.ecrRepository = this.getEcrRepository();
     this.image = this.getImage();
     this.securityGroupIds = this.getSecurityGroups();
+    this.taskDefinitionArgs = this.getTaskDefinitionArgs();
     this.service = this.getService();
 
     this.registerOutputs({});
+  }
+  getTaskDefinitionArgs(): awsx.ecs.FargateTaskDefinitionArgs {
+    return deepMerge({
+      taskRole: this.taskRole,
+      executionRole: this.executionRole,
+      container: {
+        name: this.getContainerName(),
+        image: this.image.imageUri,
+        cpu: 256,
+        memory: 512,
+        essential: true,
+        portMappings: [{
+          hostPort: 3000,
+          containerPort: 3000,
+        }],
+      },
+    }, this._args.taskDefinitionArgs);
   }
   getSecurityGroups(): (string|pulumi.Output<string>)[] {
     if (this._args.securityGroups) {

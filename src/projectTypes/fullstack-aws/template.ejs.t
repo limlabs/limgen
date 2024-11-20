@@ -25,7 +25,12 @@ const app = new AppFargate('App', {
   loadBalancer: lb.lb,
   cdnHostname: cdn.distribution.domainName,<% if (includeDb) { %>
   connectionStringSecret: db.connectionStringSecret, <% } %><% if (includeStorage) { %>
-  storage: storage.bucket,<% } %>
+  storage: storage.bucket,<% } %><% if (port !== 'unknown') { %>
+  taskDefinitionArgs: {
+    container: {
+      portMappings: [{ containerPort: <%= port %>, hostPort: <%= port %> }],
+    },
+  },<% } %>
 });
 
 export const vpcId = publicVpc.vpc.vpcId;

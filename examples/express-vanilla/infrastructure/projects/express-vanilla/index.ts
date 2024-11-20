@@ -19,6 +19,11 @@ const app = new AppFargate('App', {
   vpc: publicVpc.vpc,
   loadBalancer: lb.lb,
   cdnHostname: cdn.distribution.domainName,
+  taskDefinitionArgs: {
+    container: {
+      portMappings: [{ containerPort: 9000, hostPort: 9000 }],
+    },
+  },
 });
 
 export const vpcId = publicVpc.vpc.vpcId;

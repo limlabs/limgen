@@ -58,9 +58,9 @@ export const inputs = async () => {
   ]
 }
 
-export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, projectInputs: any) => {
+export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, projectArgs: any) => {
   let includeStorage;
-  if (projectInputs.includeStorage === 'unknown') {
+  if (projectArgs.includeStorage === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
@@ -70,13 +70,13 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
       }
     );
 
-    projectInputs.includeStorage = answer.includeStorage;
+    projectArgs.includeStorage = answer.includeStorage;
   } else {
-    includeStorage = projectInputs.includeStorage === 'true';
+    includeStorage = projectArgs.includeStorage === 'true';
   }
 
   let includeDb;
-  if (projectInputs.includeDb === 'unknown') {
+  if (projectArgs.includeDb === 'unknown') {
     const answer = await prompts(
       {
         type: 'confirm',
@@ -88,13 +88,13 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
 
     includeDb = answer.includeDb;
   } else {
-    includeDb = projectInputs.includeDb === 'true';
+    includeDb = projectArgs.includeDb === 'true';
   }
 
   return {
     includeStorage,
     includeDb,
-    port: projectInputs.port,
+    port: projectArgs.port,
   };
 }
 

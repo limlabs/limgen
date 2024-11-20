@@ -27,4 +27,5 @@ pnpm dev init \
   --projectType fullstack-aws \
   --name express-vanilla \
   --includeStorage=false \
-  --includeDb=false
+  --includeDb=false \
+  --port=9000

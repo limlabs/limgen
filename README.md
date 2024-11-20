@@ -227,7 +227,6 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 Must have:
 
-- [ ] Set port in service
 - [ ] Cloudfront --> S3 configuration
 - [ ] Private networking option
 

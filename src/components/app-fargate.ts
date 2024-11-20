@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import { prefixed } from "../utils/prefixed";
-import { deepMerge } from "../utils/deep-merge";
+import { deepMerge, RecursivePartial } from "../utils/deep-merge";
 
 export interface FullstackServiceAWSArgs {
   cdnHostname?: pulumi.Input<string>;
@@ -20,7 +20,7 @@ export interface FullstackServiceAWSArgs {
   imageArgs?: awsx.ecr.ImageArgs;
   serviceArgs?: awsx.ecs.FargateServiceArgs;
   loadBalancer?: awsx.lb.ApplicationLoadBalancer;
-  taskDefinitionArgs?: awsx.ecs.FargateTaskDefinitionArgs;
+  taskDefinitionArgs?: RecursivePartial<awsx.ecs.FargateTaskDefinitionArgs>;
 }
 
 export const defaultFullstackServiceAWSArgs: FullstackServiceAWSArgs = {
