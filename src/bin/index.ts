@@ -1,5 +1,3 @@
-#!/usr/bin/env -S npx tsx
-
 import { program } from 'commander';
 import { init } from '@/commands/init';
 import { add } from '@/commands/add';
