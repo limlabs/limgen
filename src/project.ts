@@ -77,7 +77,7 @@ export const AllProjectTypes = ['fullstack-aws'] as const;
  * @returns A promise that resolves to the imported project module.
  */
 export async function importProject(projectType: ProjectType): Promise<LimgenProject> {
-  return await import(`./projects/${projectType}/project`);
+  return await import(`./projectTypes/${projectType}/project`);
 }
 
 /**
