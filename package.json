@@ -13,7 +13,7 @@
     "build": "scripts/build.sh",
     "update-examples": "scripts/update-examples.sh"
   },
-  "keywords": [],
+  "keywords": ["iac", "infrastructure", "pulumi", "aws", "typescript"],
   "author": "Liminal Labs",
   "license": "MIT",
   "devDependencies": {
@@ -29,6 +29,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "ora": "8.1.1",
     "prompts": "^2.4.2",
     "@types/ejs": "^3.1.5",
     "commander": "^12.1.0",
