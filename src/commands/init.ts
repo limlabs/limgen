@@ -58,7 +58,7 @@ export const init = new Command()
     }
 
     const cmdToRun = `(cd ${path.join('infrastructure', 'projects', projectInputs.projectName)} && pulumi up)`;
-    await animateTyping(`Project ${colorize('cyan', projectType)} initialized successfully!`);
+    await animateTyping(`Project ${colorize('cyan', projectInputs.projectName)} initialized successfully!`);
     await delay(500);
     await animateTyping(`To deploy your resources, run ${bold(cmdToRun)}\n`);
   });
