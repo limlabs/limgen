@@ -41,14 +41,14 @@ export const init = new Command()
     const project = await importProject(projectType);
     const projectInputs = await collectProjectInputs(project, cmdArgs, frameworkType);
 
-    const projectSpinner = spinner(`Initializing project type ${colorize('yellow', projectType)}`).start();
+    const projectSpinner = spinner(`${bold('Initializing project')} …`).start();
 
     await renderProject(project, projectInputs);
 
     projectSpinner.succeed();
 
     if (AllFrameworkTypes.includes(frameworkType) && frameworkType !== 'unknown') {
-      const frameworkSpinner = spinner(`Intializing framework ${colorize('yellow', frameworkType)}`).start();
+      const frameworkSpinner = spinner(`${bold('Intializing framework')} ${colorize('yellow', frameworkType)} …`).start();
 
       const framework = await importFramework(frameworkType);
       const frameworkInputs = await collectFrameworkInputs(framework, cmdArgs, projectInputs);
