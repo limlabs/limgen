@@ -1,6 +1,6 @@
 {
   "name": "limgen",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Infrastructure as Code generator",
   "bin": "./dist/bin/index.js",
   "engines": {

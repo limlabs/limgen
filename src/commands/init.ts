@@ -4,7 +4,7 @@ import prompts from 'prompts';
 import path from 'path';
 
 import { detectFramework, FrameworkType, renderFramework, AllFrameworkTypes, importFramework, Framework } from '@/framework';
-import { AllProjectTypes, importProject, LimgenProject, renderProject } from '@/project';
+import { AllProjectTypes, importProject, LimgenProject, ProjectType, renderProject } from '@/project';
 import { renderWorkspace } from '@/workspace';
 import { bold, colorize, parseProcessArgs, spinner } from '@/cli-helpers';
 
@@ -58,8 +58,9 @@ export const init = new Command()
     }
 
     const cmdToRun = `(cd ${path.join('infrastructure', 'projects', projectInputs.projectName)} && pulumi up)`;
-    console.log(bold(`\n🤸 Project ${colorize('cyan', projectInputs.projectName)} initialized successfully! 🤸\n`));
-    console.log(`To deploy your resources, run ${bold(cmdToRun)}\n`);
+    await animateTyping(`Project ${colorize('cyan', projectType)} initialized successfully!`);
+    await delay(500);
+    await animateTyping(`To deploy your resources, run ${bold(cmdToRun)}\n`);
   });
 
 export async function getProjectType(cmdArgs: z.infer<typeof initOptionsSchema>) {
@@ -134,3 +135,28 @@ export async function collectFrameworkInputs(framework: Framework, cmdArgs: any,
   const inputs = await framework.collectInput(cmdArgs, projectInput, frameworkArgs) as Object;
   return inputs;
 }
+  
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const animateTyping = async (message: string) => {
+  // only log if we are in a TTY
+  if (!process.stdout.isTTY) {
+    process.stdout.write(`${message}\n`);
+    return;
+  }
+
+  const minDelay = 10; // Minimum delay between "keypresses" in milliseconds
+  const maxDelay = 45; // Maximum delay between "keypresses" in milliseconds
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  process.stdout.write("\n");
+
+  for (let i = 0; i < message.length; i++) {
+    const char = message[i];
+    process.stdout.write(char); // Print one character at a time
+    const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    await delay(randomDelay);
+  }
+
+  process.stdout.write("\n"); // Move to the next line after completing the animation
+};
