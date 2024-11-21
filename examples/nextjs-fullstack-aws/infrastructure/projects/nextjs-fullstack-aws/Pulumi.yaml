@@ -1,4 +1,4 @@
-name: nextjs-fullstack
+name: nextjs-fullstack-aws
 description: A pulumi project created with limgen
 runtime:
   name: nodejs

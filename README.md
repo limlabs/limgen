@@ -54,7 +54,7 @@ Check out the [examples](./examples/) folder for a list of several officially-ma
 
 ### Project
 
-A Pulumi infrastructure project with its own lifecycle.
+A Pulumi infrastructure [project](https://www.pulumi.com/docs/iac/concepts/projects/) with its own lifecycle.
 
 In Pulumi, each project has one or more "stacks", which is essentially its own environment.
 
@@ -64,7 +64,7 @@ Each project folder has the following layout:
 project/
     index.ts # The entry point where pulumi resources are declared
     Pulumi.yaml # The Pulumi configuration file generated when running pulumi init or limgen init
-    Pulumi.<stackName>.yaml # Configuration for a specific stack (environment) within the project
+    # ... other project-specific files
 ```
 
 #### Project Types

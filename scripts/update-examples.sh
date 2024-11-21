@@ -2,28 +2,28 @@
 
 set -e
 
-echo "Updating nextjs-fullstack..."
-rm -rf examples/nextjs-fullstack/infrastructure
+echo "Updating nextjs-fullstack-aws..."
+rm -rf examples/nextjs-fullstack-aws/infrastructure
 pnpm dev init \
-  --directory examples/nextjs-fullstack \
+  --directory examples/nextjs-fullstack-aws \
   --projectType fullstack-aws \
-  --name nextjs-fullstack \
+  --name nextjs-fullstack-aws \
   --includeStorage \
   --includeDb
 
-echo "Updating nextjs-vanilla..."
-rm -rf examples/nextjs-vanilla/infrastructure examples/nextjs-vanilla/Dockerfile examples/nextjs-vanilla/.dockerignore
+echo "Updating nextjs-fullstack-aws-vanilla..."
+rm -rf examples/nextjs-fullstack-aws-vanilla/infrastructure examples/nextjs-fullstack-aws-vanilla/Dockerfile examples/nextjs-fullstack-aws-vanilla/.dockerignore
 pnpm dev init \
-  --directory examples/nextjs-vanilla \
+  --directory examples/nextjs-fullstack-aws-vanilla \
   --projectType fullstack-aws \
   --name nextjs-vanilla \
   --includeStorage=false \
   --includeDb=false
 
-echo "Updating express-vanilla..."
-rm -rf examples/express-vanilla/infrastructure
+echo "Updating express-fullstack-aws-vanilla..."
+rm -rf examples/express-fullstack-aws-vanilla/infrastructure
 pnpm dev init \
-  --directory examples/express-vanilla \
+  --directory examples/express-fullstack-aws-vanilla \
   --projectType fullstack-aws \
   --name express-vanilla \
   --includeStorage=false \
