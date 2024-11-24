@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { join } from 'path';
 
 /**
  * Copies dependencies required for the project to the infrastructure directory.
@@ -9,7 +10,7 @@ import fs from 'fs/promises';
  */
 export async function copyFileDependencies(files: string[]) {
   for (const dep of files) {
-    await fs.copyFile(`${__dirname}/${dep}`, `infrastructure/${dep}`);
+    await fs.copyFile(join(__dirname, dep), join('infrastructure', dep));
   }
 }
 

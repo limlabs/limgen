@@ -2,6 +2,8 @@ import fs from 'fs/promises';
 import { AllProjectTypes } from './project';
 import { copyFileDependencies } from './files';
 import { installDependencies } from './npm';
+import { initOptionsSchema } from './commands/init';
+import { z } from 'zod';
 
 /**
  * Represents the type of framework being used.
@@ -73,13 +75,13 @@ export async function importFramework(frameworkType: FrameworkType): Promise<Fra
   return await import(`./frameworks/${frameworkType}/framework`);
 }
 
-export async function renderFramework(framework: Framework, inputs: any) {
+export async function renderFramework(cmdArgs: z.infer<typeof initOptionsSchema>, framework: Framework, inputs: any) {
   const tasks: Promise<unknown>[] = [framework.default(inputs)];
 
   if (framework.dependsOn) {
     const { packages, files } = await framework.dependsOn(inputs);
     tasks.push(copyFileDependencies(files));
-    tasks.push(installDependencies(packages));
+    tasks.push(installDependencies(cmdArgs.directory, packages));
   }
 
   await Promise.all(tasks);

@@ -4,6 +4,8 @@ import path from "path";
 import { generatePackageJSON, generateTSConfig } from "./workspace";
 import { copyFileDependencies } from "./files";
 import { installDependencies } from "./npm";
+import { initOptionsSchema } from "./commands/init";
+import { z } from "zod";
 
 /**
  * Represents the type of a project.
@@ -142,13 +144,13 @@ config:
   await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'Pulumi.yaml'), yaml);
 }
 
-export async function renderProject(project: LimgenProject, inputs: any) {
+export async function renderProject(cmdArgs: z.infer<typeof initOptionsSchema>, project: LimgenProject, inputs: any) {
   const { packages, files } = await project.dependsOn(inputs);
 
   await Promise.all([
-    copyFileDependencies(files),
+    copyFileDependencies(files, cmdArgs.directory),
     generateIndexFile(project, inputs),
-    generatePackageJSON().then(() => installDependencies(packages)),
+    generatePackageJSON().then(() => installDependencies(cmdArgs.directory, packages)),
     generateTSConfig(),
     generateProjectYaml(inputs),
   ])

@@ -9,7 +9,7 @@ import { renderWorkspace } from '@/workspace';
 import { bold, colorize, parseProcessArgs, spinner } from '@/cli-helpers';
 
 export const initOptionsSchema = z.object({
-  directory: z.string().optional(),
+  directory: z.string().optional().default(process.cwd()),
   name: z.string().optional(),
   framework: z.string().optional(),
   projectType: z.enum(AllProjectTypes).optional(),
@@ -43,7 +43,7 @@ export const init = new Command()
 
     const projectSpinner = spinner(`${bold('Initializing project')} …`).start();
 
-    await renderProject(project, projectInputs);
+    await renderProject(cmdArgs, project, projectInputs);
 
     projectSpinner.succeed();
 
@@ -52,7 +52,7 @@ export const init = new Command()
 
       const framework = await importFramework(frameworkType);
       const frameworkInputs = await collectFrameworkInputs(framework, cmdArgs, projectInputs);
-      await renderFramework(framework, frameworkInputs);
+      await renderFramework(cmdArgs, framework, frameworkInputs);
 
       frameworkSpinner.succeed();
     }
