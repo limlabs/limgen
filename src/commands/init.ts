@@ -98,7 +98,7 @@ export async function collectProjectInputs(project: LimgenProject, cmdArgs: any,
       type: 'text',
       name: 'projectName',
       message: 'Enter a project name',
-      initial: `${projectType}${framework !== 'unknown' ? '-'+framework : ''}-${basename(cmdArgs.directory)}`,
+      initial: `${basename(cmdArgs.directory)}-${projectType}${framework !== 'unknown' ? '-'+framework : ''}`,
     });
 
     projectName = result.projectName;
