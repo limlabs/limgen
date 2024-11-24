@@ -26,7 +26,7 @@ export const add = new Command()
     console.log(`Adding component ${component}...`);
 
     const path = `components/${component}.ts`;
-    await copyFileDependencies([path], cmdArgs.directory);
+    await copyFileDependencies([path]);
     const code = await fs.readFile(`${__dirname}/../${path}`, 'utf8');
     let imports = await extractImports(code);
 

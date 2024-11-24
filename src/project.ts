@@ -148,7 +148,7 @@ export async function renderProject(cmdArgs: z.infer<typeof initOptionsSchema>, 
   const { packages, files } = await project.dependsOn(inputs);
 
   await Promise.all([
-    copyFileDependencies(files, cmdArgs.directory),
+    copyFileDependencies(files),
     generateIndexFile(project, inputs),
     generatePackageJSON().then(() => installDependencies(cmdArgs.directory, packages)),
     generateTSConfig(),
