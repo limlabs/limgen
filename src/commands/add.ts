@@ -17,7 +17,11 @@ export const add = new Command()
   .argument('<component>', 'Name of the component to add')
   .option('-d, --directory <directory>', 'Directory for the base infrastructure folder where the component should be added', process.cwd())
   .action(async (component: string, options: any) => {
-    const cmdArgs = addOptionsSchema.parse(options);
+    const cmdArgs = addOptionsSchema.parse({ component, ...options });
+    if (options.directory) {
+      process.chdir(options.directory);
+    }
+
     if (!doesComponentExist(component)) {
       throw new Error(`Component ${component} does not exist`);
     }

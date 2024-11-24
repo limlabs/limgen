@@ -1,5 +1,5 @@
 import test, { describe } from 'node:test';
-import fullstackAWSProject, { FullstackAWSProjectOptions, renderIndex } from '@/projects/fullstack-aws/project';
+import { FullstackAWSProjectOptions, renderIndex } from '@/projectTypes/fullstack-aws/project';
 import assert from 'node:assert';
 
 describe('fullstackAWSProject', () => {
@@ -7,6 +7,7 @@ describe('fullstackAWSProject', () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: false,
       includeDb: false,
+      port: 'unknown',
     };
     const template = await renderIndex(opts);
     assert(!template.includes('import { StorageS3 }'));
@@ -18,6 +19,7 @@ describe('fullstackAWSProject', () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: true,
       includeDb: false,
+      port: 'unknown',
     };
     const template = await renderIndex(opts);
     assert.ok(template.includes('import { StorageS3 }'));
@@ -34,6 +36,7 @@ describe('fullstackAWSProject', () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: false,
       includeDb: true,
+      port: 'unknown',
     };
     const template = await renderIndex(opts);
     assert.ok(template.includes('import { PostgresRdsCluster }'));
@@ -50,6 +53,7 @@ describe('fullstackAWSProject', () => {
     const opts: FullstackAWSProjectOptions = {
       includeStorage: true,
       includeDb: true,
+      port: 'unknown',
     };
     const template = await renderIndex(opts);
     assert.ok(template.includes('import { StorageS3 }'));
@@ -60,5 +64,15 @@ describe('fullstackAWSProject', () => {
     assert.ok(template.includes('const db = new PostgresRdsCluster'));
     assert.ok(template.includes('connectionStringSecret: db.connectionStringSecret,'));
     assert.ok(template.includes('export const dbCluster = db.dbCluster.clusterIdentifier;'));
+  });
+
+  test('should generate template with port', async () => {
+    const opts: FullstackAWSProjectOptions = {
+      includeStorage: false,
+      includeDb: false,
+      port: '8080',
+    };
+    const template = await renderIndex(opts);
+    assert.ok(template.includes('8080'));
   });
 });

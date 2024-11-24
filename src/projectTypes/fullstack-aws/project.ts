@@ -101,6 +101,7 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
 export type FullstackAWSProjectOptions = {
   includeStorage: boolean;
   includeDb: boolean;
+  port: string;
 };
 
 export default async function fullstackAWSProject(inputs: FullstackAWSProjectOptions): Promise<string> {

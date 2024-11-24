@@ -52,7 +52,7 @@ describe('add command', async () => {
       fs.access('infrastructure/components/storage-s3.ts')
     );
 
-    const packageJson = JSON.parse(await fs.readFile('package.json', 'utf8'));
+    const packageJson = JSON.parse(await fs.readFile('infrastructure/package.json', 'utf8'));
     assert.ok(packageJson.dependencies['@pulumi/pulumi']);
     assert.ok(packageJson.dependencies['@pulumi/aws']);
   });
