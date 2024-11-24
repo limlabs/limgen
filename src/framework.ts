@@ -43,7 +43,6 @@ export const RecognizedProjectFrameworkTypes = {
  * @returns {Promise<FrameworkType>} The detected framework type.
  */
 export async function detectFramework(): Promise<FrameworkType> {
-  console.log('Detecting framework...', process.cwd());
   const packageJSON = await fs.readFile('package.json', 'utf-8');
   const packageJSONParsed = JSON.parse(packageJSON);
   
