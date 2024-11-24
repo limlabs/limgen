@@ -30,11 +30,11 @@ export type ProjectDependencyInfo = {
  * @template TOpts - The type of options that can be passed to the project methods.
  */
 export type LimgenProject<TOpts = unknown> = {
-  inputs(initArgs: { name: string; }): {
+  inputs(initArgs: { name: string; }): Promise<{
     name: string;
     message: string;
     schema: any;
-  }[],
+  }[]>,
 
   /**
    * Renders a project template with the provided options.

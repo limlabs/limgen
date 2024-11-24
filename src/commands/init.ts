@@ -1,7 +1,7 @@
 import z from 'zod';
 import { Command } from 'commander';
 import prompts from 'prompts';
-import path from 'path';
+import path, { basename } from 'path';
 
 import { detectFramework, FrameworkType, renderFramework, AllFrameworkTypes, importFramework, Framework } from '@/framework';
 import { AllProjectTypes, importProject, LimgenProject, ProjectType, renderProject } from '@/project';
@@ -19,7 +19,7 @@ export const init = new Command()
   .name('init')
   .allowUnknownOption(true)
   .description('Initialize a new infrastructure project')
-  .option('-d, --directory <directory>', 'Directory where the infrastructure folder should be added')
+  .option('-d, --directory <directory>', 'Directory where the infrastructure folder should be added', process.cwd())
   .option('-n, --name <name>', 'Name of the project')
   .option('-t, --projectType <type>', 'Type of project to create')
   .option('-f, --framework <framework>', 'Framework to use')
@@ -39,7 +39,7 @@ export const init = new Command()
 
     const projectType = await getProjectType(cmdArgs);
     const project = await importProject(projectType);
-    const projectInputs = await collectProjectInputs(project, cmdArgs, frameworkType);
+    const projectInputs = await collectProjectInputs(project, cmdArgs, projectType, frameworkType);
 
     const projectSpinner = spinner(`${bold('Initializing project')} …`).start();
 
@@ -78,8 +78,7 @@ export async function getProjectType(cmdArgs: z.infer<typeof initOptionsSchema>)
   return answer.projectType;
 }
 
-
-export async function collectProjectInputs(project: LimgenProject, cmdArgs: any, framework: FrameworkType) {
+export async function collectProjectInputs(project: LimgenProject, cmdArgs: any, projectType: ProjectType, framework: FrameworkType) {
   const projectInput = await project.inputs(cmdArgs);
   const schema = projectInput.reduce((acc, opt) => {
     acc[opt.name] = opt.schema;
@@ -99,12 +98,11 @@ export async function collectProjectInputs(project: LimgenProject, cmdArgs: any,
       type: 'text',
       name: 'projectName',
       message: 'Enter a project name',
-      initial: 'my-project',
+      initial: `${projectType}${framework !== 'unknown' ? '-'+framework : ''}-${basename(cmdArgs.directory)}`,
     });
 
     projectName = result.projectName;
   }
-
 
   const projectArgs = z.object(schema).parse(processArgs);
   const inputs = await project.collectInput(cmdArgs, projectArgs) as Object;
