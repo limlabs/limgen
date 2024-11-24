@@ -4,7 +4,7 @@ import prompts from 'prompts';
 import z from 'zod';
 import fs from 'fs/promises';
 import { initOptionsSchema } from '../../commands/init';
-import { cliBoolean, cliInteger } from '../../schema';
+import { cliBoolean, cliEnum, cliInteger } from '../../schema';
 import { fileExists } from '../../files';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
@@ -51,6 +51,11 @@ export const inputs = async () => {
       schema: cliBoolean(),
     },
     {
+      name: 'networkType',
+      message: 'Network type',
+      schema: cliEnum(['public', 'private']).optional(),
+    },
+    {
       name: 'port',
       message: 'Port to expose',
       schema: cliInteger().optional().default('3000'),
@@ -91,9 +96,28 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
     includeDb = projectArgs.includeDb === 'true';
   }
 
+  let networkType = projectArgs.networkType;
+  if (projectArgs.networkType === 'unknown') {
+    const answer = await prompts(
+      {
+        type: 'select',
+        name: 'networkType',
+        message: 'Network type?',
+        choices: [
+          { title: 'Public (simpler, suitable for development)', value: 'public' },
+          { title: 'Private (more secure, requires tunnel to access database)', value: 'private' },
+        ],
+        initial: 0,
+      }
+    );
+
+    networkType = answer.networkType;
+  }
+
   return {
     includeStorage,
     includeDb,
+    networkType,
     port: projectArgs.port,
   };
 }
@@ -101,6 +125,7 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
 export type FullstackAWSProjectOptions = {
   includeStorage: boolean;
   includeDb: boolean;
+  networkType: 'public' | 'private';
   port: string;
 };
 

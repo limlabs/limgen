@@ -9,7 +9,8 @@ pnpm dev init \
   --projectType fullstack-aws \
   --name nextjs-fullstack-aws \
   --includeStorage \
-  --includeDb
+  --includeDb \
+  --networkType=public
 
 echo "Updating nextjs-fullstack-aws-vanilla..."
 rm -rf examples/nextjs-fullstack-aws-vanilla/infrastructure examples/nextjs-fullstack-aws-vanilla/Dockerfile examples/nextjs-fullstack-aws-vanilla/.dockerignore
@@ -18,7 +19,8 @@ pnpm dev init \
   --projectType fullstack-aws \
   --name nextjs-vanilla \
   --includeStorage=false \
-  --includeDb=false
+  --includeDb=false \
+  --networkType=public
 
 echo "Updating express-fullstack-aws-vanilla..."
 rm -rf examples/express-fullstack-aws-vanilla/infrastructure
@@ -28,4 +30,5 @@ pnpm dev init \
   --name express-vanilla \
   --includeStorage=false \
   --includeDb=false \
-  --port=9000
+  --networkType=public \
+  --port=9000 

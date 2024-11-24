@@ -8,29 +8,25 @@ import { CdnCloudFront } from "../../components/cdn-cloudfront";
 import { PostgresRdsCluster } from "../../components/db-postgres-rds";
 import { StorageS3 } from "../../components/storage-s3";
 
-const publicVpc = new VpcPublic;
-const lb = new LoadBalancerAlbPublic('LoadBalancer', {
-  vpc: publicVpc.vpc,
-});
+const { vpc } = new VpcPublic;
+const lb = new LoadBalancerAlbPublic('LoadBalancer', { vpc });
 
 const storage = new StorageS3;
-const db = new PostgresRdsCluster('Database', { vpc: publicVpc.vpc });
+const db = new PostgresRdsCluster('Database', { vpc });
 const cdn = new CdnCloudFront('CDN', {
   lb: lb.lb,
   storage: storage.bucket,
 });
 
 const app = new AppFargate('App', {
-  vpc: publicVpc.vpc,
+  vpc,
   loadBalancer: lb.lb,
   cdnHostname: cdn.distribution.domainName,
   connectionStringSecret: db.connectionStringSecret, 
   storage: storage.bucket,
 });
 
-export const vpcId = publicVpc.vpc.vpcId;
-export const publicSubnetIds = publicVpc.vpc.publicSubnetIds;
-export const cluster = app.cluster.arn;
+export const vpcId = vpc.vpcId;
 export const service = app.service.service.name;
 export const cdnHostname = pulumi.interpolate`https://${cdn.distribution.domainName}`;
 export const objectStorageBucket = storage.bucket.bucket;

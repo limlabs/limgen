@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 
 export type NullableCliOption = 'true' | 'false' | 'unknown';
 
@@ -17,3 +17,5 @@ export const cliInteger = () => z.string().refine((val) => {
 
   return parsed;
 });
+
+export const cliEnum = (options: string[]) => z.enum([options[0], ...options.slice(1), 'unknown'])
