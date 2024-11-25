@@ -18,4 +18,4 @@ export const cliInteger = () => z.string().refine((val) => {
   return parsed;
 });
 
-export const cliEnum = (options: string[]) => z.enum([options[0], ...options.slice(1), 'unknown'])
+export const cliEnum = (options: any) => z.enum(options);

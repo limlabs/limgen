@@ -6,7 +6,8 @@ import fs from 'fs/promises';
 import { initOptionsSchema } from '../../commands/init';
 import { cliBoolean, cliEnum, cliInteger } from '../../schema';
 import { fileExists } from '../../files';
-import { readProjectMetadata } from '@/project';
+import { readProjectMetadata } from '../../project';
+import { execPromise } from '../../utils/exec';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   const files: string[] = [
@@ -33,7 +34,7 @@ export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
     files.push('components/db-postgres-rds.ts');
     packages.push('@pulumi/random');
   }
-  
+
   if (opts.networkType === 'private') {
     files.push('components/bastion-ec2.ts');
   }
@@ -131,22 +132,39 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
 
 export const envPull = async ({
   projectName,
-  directory,
   stack,
 }: {
   projectName: string;
-  directory: string;
   stack: string;
 }) => {
-  const metadata = await readProjectMetadata({ projectName, directory });
+  const metadata = await readProjectMetadata({ projectName });
   const projectInputs = metadata.projectInputs as FullstackAWSProjectOptions;
-  if (projectInputs.includeDb) {
-    console.log('DATABASE_URL=postgres://user:password@host:port/dbname');
-  }
+  const properties = {};
 
   if (projectInputs.includeStorage) {
-    console.log('S3_BUCKET=my-bucket-name');
+    const { stdout: BUCKET_NAME } = await execPromise(
+      `pulumi stack output objectStorageBucket --stack ${stack}`,
+      { cwd: path.join('infrastructure', 'projects', projectName) });
+      
+    Object.assign(properties, { BUCKET_NAME });
   }
+
+  if (projectInputs.includeDb) {
+    const { stdout: secretId } = await execPromise(
+      `pulumi stack output dbSecret --stack ${stack}`,
+      { cwd: path.join('infrastructure', 'projects', projectName) });
+
+    const { stdout: secretResponse } = await execPromise(`aws secretsmanager get-secret-value --secret-id ${secretId}`);
+
+    const DATABASE_URL = JSON.parse(secretResponse).SecretString;
+    if (!DATABASE_URL) {
+      throw new Error(`Could not get secret value for ${secretId}`);
+    }
+
+    Object.assign(properties, { DATABASE_URL });
+  }
+
+  await fs.writeFile('.env', Object.entries(properties).map(([key, value]) => `${key}=${value}`.trim()).join('\n'));
 }
 
 export type FullstackAWSProjectOptions = {
@@ -181,6 +199,7 @@ npm-debug.log
 README.md
 .next
 .git
+.env*
 infrastructure/`.trim());
   }
 }

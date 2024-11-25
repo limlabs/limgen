@@ -5,8 +5,7 @@ import fs from 'fs/promises';
 import path from "path";
 import prompts from "prompts";
 import { spinner } from "@/cli-helpers";
-import { exec } from 'child_process';
-import util from 'util';
+import { execPromise } from "@/utils/exec";
 
 const envPullOptionsSchema = z.object({
   project: z.string().optional(),
@@ -87,8 +86,6 @@ async function getStackName(opts: { projectName: string; stack?: string; }) {
     return opts.stack;
   }
 
-  const execPromise = util.promisify(exec);
-  console.log('pulumi stack ls --json', path.join('infrastructure', 'projects', opts.projectName));
   const { stdout } = await execPromise('pulumi stack ls --json', {
     cwd: path.join('infrastructure', 'projects', opts.projectName)
   });
