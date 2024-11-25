@@ -8,4 +8,12 @@ config:
   pulumi:tags:
     value:
       pulumi:template: aws-typescript
-  
+limgen:
+  projectName: express-vanilla
+  projectType: fullstack-aws
+  projectInputs:
+    includeStorage: false
+    includeDb: false
+    networkType: public
+    port: 9000
+

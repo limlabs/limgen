@@ -13,11 +13,16 @@
     "build": "scripts/build.sh",
     "update-examples": "scripts/update-examples.sh"
   },
-  "keywords": ["iac", "infrastructure", "pulumi", "aws", "typescript"],
+  "keywords": [
+    "iac",
+    "infrastructure",
+    "pulumi",
+    "aws",
+    "typescript"
+  ],
   "author": "Liminal Labs",
   "license": "MIT",
   "devDependencies": {
-    "tsc-alias": "1.8.10",
     "@pulumi/aws": "^6.59.1",
     "@pulumi/awsx": "^2.18.1",
     "@pulumi/pulumi": "^3.138.0",
@@ -25,15 +30,18 @@
     "@types/node": "^22.9.0",
     "@types/prompts": "^2.4.9",
     "@types/yargs": "^17.0.33",
+    "tsc-alias": "1.8.10",
     "tsx": "^4.19.2",
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "ora": "8.1.1",
-    "prompts": "^2.4.2",
     "@types/ejs": "^3.1.5",
+    "@types/js-yaml": "^4.0.9",
     "commander": "^12.1.0",
     "ejs": "^3.1.10",
+    "js-yaml": "^4.1.0",
+    "ora": "8.1.1",
+    "prompts": "^2.4.2",
     "zod": "^3.23.8"
   }
 }

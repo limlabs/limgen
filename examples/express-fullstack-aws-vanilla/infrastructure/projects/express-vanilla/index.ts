@@ -24,6 +24,7 @@ const app = new AppFargate('App', {
   },
 });
 
+
 export const vpcId = vpc.vpcId;
 export const service = app.service.service.name;
 export const cdnHostname = pulumi.interpolate`https://${cdn.distribution.domainName}`;

@@ -232,7 +232,7 @@ Must have:
 
 Like to have:
 
-- Improve default project name
+- Prettier integration
 - Static site aws project
 - NextJS static site example
 - Resource - Bastion

@@ -12,7 +12,9 @@ const { vpc } = new VpcPublic;
 const lb = new LoadBalancerAlbPublic('LoadBalancer', { vpc });
 
 const storage = new StorageS3;
-const db = new PostgresRdsCluster('Database', { vpc });
+const db = new PostgresRdsCluster('Database', {
+  vpc,
+});
 const cdn = new CdnCloudFront('CDN', {
   lb: lb.lb,
   storage: storage.bucket,
@@ -25,6 +27,7 @@ const app = new AppFargate('App', {
   connectionStringSecret: db.connectionStringSecret, 
   storage: storage.bucket,
 });
+
 
 export const vpcId = vpc.vpcId;
 export const service = app.service.service.name;

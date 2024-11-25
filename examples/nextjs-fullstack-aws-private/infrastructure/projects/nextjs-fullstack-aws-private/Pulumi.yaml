@@ -1,0 +1,19 @@
+name: nextjs-fullstack-aws-private
+description: A pulumi project created with limgen
+runtime:
+  name: nodejs
+  options:
+    packagemanager: pnpm
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-typescript
+limgen:
+  projectName: nextjs-fullstack-aws-private
+  projectType: fullstack-aws
+  projectInputs:
+    includeStorage: true
+    includeDb: true
+    networkType: private
+    port: unknown
+

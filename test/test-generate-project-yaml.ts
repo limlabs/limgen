@@ -8,7 +8,13 @@ describe('generateProjectYaml', async () => {
   process.chdir('test/output');
 
   test('should generate a Pulumi.yaml file', async () => {
-    await generateProjectYaml({ projectName: 'my-project' });
+    await generateProjectYaml({
+      projectName: 'my-project',
+      projectType: 'aws-fullstack',
+      framework: 'aws',
+      includeStorage: false,
+      includeDb: false
+    });
 
     const yaml = await fs.readFile('infrastructure/projects/my-project/Pulumi.yaml', 'utf-8');
     assert.equal(yaml, `
@@ -22,6 +28,14 @@ config:
   pulumi:tags:
     value:
       pulumi:template: aws-typescript
-  `.trimStart());
+limgen:
+    projectName: my-project
+    projectType: aws-fullstack
+    framework: aws
+    projectInputs:
+      includeStorage: false
+      includeDb: false
+
+`.trimStart());
   });
 });

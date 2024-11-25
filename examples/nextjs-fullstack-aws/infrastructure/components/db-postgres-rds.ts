@@ -8,7 +8,7 @@ import { deepMerge } from "../utils/deep-merge";
 export interface PostgresRdsClusterArgs {
   vpc: awsx.ec2.Vpc;
   securityGroups?: aws.ec2.SecurityGroup[];
-  subnetIds?: pulumi.Input<string>[];
+  subnetIds?: pulumi.Input<string[]>;
   ingressType?: "public" | "private";
   clusterConfig?: aws.rds.ClusterArgs;
   databaseConfigs?: (

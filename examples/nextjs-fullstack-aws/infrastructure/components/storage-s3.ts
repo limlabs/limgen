@@ -13,7 +13,7 @@ export class StorageS3 extends pulumi.ComponentResource {
   constructor(name: string = 'Storage', args?: StorageS3Args, opts?: pulumi.ComponentResourceOptions) {
     super("limgen:StorageS3Component", name, {}, opts);
     this.bucket = new aws.s3.BucketV2("ObjectStorage", deepMerge({
-      bucketPrefix: prefixed("storage"),
+      bucketPrefix: prefixed("storage", 37),
     }, args?.bucketArgs));
 
     this.registerOutputs({

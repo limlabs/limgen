@@ -1,11 +1,11 @@
 import { promises as fs } from "fs";
-import { exec } from "child_process";
 import path from "path";
 import { generatePackageJSON, generateTSConfig } from "./workspace";
 import { copyFileDependencies } from "./files";
 import { installDependencies } from "./npm";
 import { initOptionsSchema } from "./commands/init";
 import { z } from "zod";
+import { parseYaml } from "./yaml";
 
 /**
  * Represents the type of a project.
@@ -64,6 +64,31 @@ export type LimgenProject<TOpts = unknown> = {
   collectInput: (initArgs: {
     projectName: string;
   }, opts: any) => Promise<TOpts>;
+
+  /**
+   * The type of the project.
+   */
+  type: ProjectType;
+
+  /**
+   * The name of the project.
+   */
+  name: string;
+
+  /**
+   * Pulls environment variables for the project.
+   * 
+   * @param project - The name of the project to pull environment variables from.
+   * @param stack - The name of the stack to pull environment variables from.
+   * @returns A promise that resolves when the environment variables have been pulled.
+   * @throws An error if the environment variables could not be pulled.
+   * @remarks This method is optional and may not be implemented by all projects.
+   * @example
+   * ```typescript
+   * await project.envPull('my-project', 'dev');
+   * ```
+   */
+  envPull?: (opts: { projectName: string, stack: string }) => Promise<void>;
 }
 
 /**
@@ -78,7 +103,7 @@ export const AllProjectTypes = ['fullstack-aws'] as const;
  * @param projectType - The type of the project to import.
  * @returns A promise that resolves to the imported project module.
  */
-export async function importProject(projectType: ProjectType): Promise<LimgenProject> {
+export async function importProjectType(projectType: ProjectType): Promise<LimgenProject> {
   return await import(`./projectTypes/${projectType}/project`);
 }
 
@@ -116,6 +141,8 @@ export async function generateIndexFile(project: LimgenProject, inputs: any) {
  * Options for generating a project YAML file.
  */
 export interface ProjectYamlOptions {
+  projectType: any;
+  framework: any;
   projectName: string;
 }
 
@@ -125,10 +152,11 @@ export interface ProjectYamlOptions {
  * @param opts - The options to use when generating the project YAML file.
  * @returns A promise that resolves when the project YAML file has been written.
  */
-export async function generateProjectYaml(opts: ProjectYamlOptions) {
+export async function generateProjectYaml(opts: ProjectYamlOptions & Record<string, any>) {
+  const { projectName, projectType: type, framework, ...projectInputs } = opts;
+
   await ensureProjectFolder(opts.projectName);
   const yaml = `
-
 name: ${opts.projectName}
 description: A pulumi project created with limgen
 runtime:
@@ -139,7 +167,14 @@ config:
   pulumi:tags:
     value:
       pulumi:template: aws-typescript
-  `.trimStart()
+limgen:
+  projectName: ${opts.projectName}
+  projectType: ${opts.projectType}${opts.framework ? `
+  framework: ${opts.framework}` : ''}${Object.keys(projectInputs).length ? `
+  projectInputs:${Object.entries(projectInputs).map(([key, value]) => `
+    ${key}: ${value}`).join('')}` : ''}
+
+`.trimStart()
 
   await fs.writeFile(path.join('infrastructure', 'projects', opts.projectName, 'Pulumi.yaml'), yaml);
 }
@@ -154,4 +189,24 @@ export async function renderProject(cmdArgs: z.infer<typeof initOptionsSchema>, 
     generateTSConfig(),
     generateProjectYaml(inputs),
   ])
+}
+
+export async function readProjectMetadata(opts: { projectName: string; }) {
+  const pulumiYamlPath = path.join('infrastructure', 'projects', opts.projectName, 'Pulumi.yaml');
+  const pulumiYaml = await fs.readFile(pulumiYamlPath, 'utf-8');
+
+  // get the settings under the limgen key
+  if (!/limgen:(\n\s+.*)+/g.test(pulumiYaml)) {
+    throw new Error(`Could not find limgen settings in ${pulumiYamlPath}`);
+  }
+
+  const { limgen } = parseYaml(pulumiYaml) as any;
+  const limgenSchema = z.object({
+    projectName: z.string(),
+    projectType: z.string(),
+    framework: z.string().optional(),
+    projectInputs: z.record(z.unknown()),
+  });
+
+  return limgenSchema.parse(limgen);
 }

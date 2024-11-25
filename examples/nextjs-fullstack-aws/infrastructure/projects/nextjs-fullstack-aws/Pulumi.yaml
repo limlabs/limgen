@@ -8,4 +8,12 @@ config:
   pulumi:tags:
     value:
       pulumi:template: aws-typescript
-  
+limgen:
+  projectName: nextjs-fullstack-aws
+  projectType: fullstack-aws
+  projectInputs:
+    includeStorage: true
+    includeDb: true
+    networkType: public
+    port: unknown
+

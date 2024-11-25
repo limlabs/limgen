@@ -4,7 +4,7 @@ import prompts from 'prompts';
 import path, { basename } from 'path';
 
 import { detectFramework, FrameworkType, renderFramework, AllFrameworkTypes, importFramework, Framework } from '@/framework';
-import { AllProjectTypes, importProject, LimgenProject, ProjectType, renderProject } from '@/project';
+import { AllProjectTypes, importProjectType, LimgenProject, ProjectType, renderProject } from '@/project';
 import { renderWorkspace } from '@/workspace';
 import { bold, colorize, parseProcessArgs, spinner } from '@/cli-helpers';
 
@@ -38,7 +38,7 @@ export const init = new Command()
     await renderWorkspace();
 
     const projectType = await getProjectType(cmdArgs);
-    const project = await importProject(projectType);
+    const project = await importProjectType(projectType);
     const projectInputs = await collectProjectInputs(project, cmdArgs, projectType, frameworkType);
 
     const projectSpinner = spinner(`${bold('Initializing project')} …`).start();
@@ -109,7 +109,7 @@ export async function collectProjectInputs(project: LimgenProject, cmdArgs: any,
 
   return {
     projectName,
-    projectType: cmdArgs.projectType,
+    projectType,
     ...inputs,
   };
 }

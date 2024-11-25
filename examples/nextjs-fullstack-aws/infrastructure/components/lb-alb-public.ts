@@ -19,10 +19,10 @@ export class LoadBalancerAlbPublic extends pulumi.ComponentResource {
     this._args = args;
 
     this.lb = new awsx.lb.ApplicationLoadBalancer("LoadBalancer", deepMerge({
-      name: prefixed("lb"),
+      name: prefixed("lb", 24),
       defaultSecurityGroup: {
         args: {
-          name: prefixed("sg-lb"),
+          name: prefixed("sg-lb", 32),
           vpcId: this._args.vpc.vpc.id,
           ingress: [
             {
@@ -45,7 +45,7 @@ export class LoadBalancerAlbPublic extends pulumi.ComponentResource {
       subnetIds: this._args.vpc.publicSubnetIds,
       defaultTargetGroup: {
         vpcId: this._args.vpc.vpcId,
-        name: prefixed("tg"),
+        name: prefixed("tg", 32),
         port: 3000,
         targetType: "ip",
         deregistrationDelay: 10,

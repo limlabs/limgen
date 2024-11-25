@@ -6,6 +6,7 @@ import fs from 'fs/promises';
 import { initOptionsSchema } from '../../commands/init';
 import { cliBoolean, cliEnum, cliInteger } from '../../schema';
 import { fileExists } from '../../files';
+import { readProjectMetadata } from '@/project';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   const files: string[] = [
@@ -21,6 +22,7 @@ export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
     '@pulumi/aws',
     '@pulumi/awsx',
     '@pulumi/pulumi',
+    'zod',
   ];
 
   if (opts.includeStorage) {
@@ -30,6 +32,10 @@ export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   if (opts.includeDb) {
     files.push('components/db-postgres-rds.ts');
     packages.push('@pulumi/random');
+  }
+  
+  if (opts.networkType === 'private') {
+    files.push('components/bastion-ec2.ts');
   }
 
   return {
@@ -64,7 +70,7 @@ export const inputs = async () => {
 }
 
 export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, projectArgs: any) => {
-  let includeStorage;
+  let includeStorage
   if (projectArgs.includeStorage === 'unknown') {
     const answer = await prompts(
       {
@@ -75,7 +81,7 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
       }
     );
 
-    projectArgs.includeStorage = answer.includeStorage;
+    includeStorage = answer.includeStorage;
   } else {
     includeStorage = projectArgs.includeStorage === 'true';
   }
@@ -102,7 +108,7 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
       {
         type: 'select',
         name: 'networkType',
-        message: 'Network type?',
+        message: 'Network type',
         choices: [
           { title: 'Public (simpler, suitable for development)', value: 'public' },
           { title: 'Private (more secure, requires tunnel to access database)', value: 'private' },
@@ -120,6 +126,27 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
     networkType,
     port: projectArgs.port,
   };
+}
+
+
+export const envPull = async ({
+  projectName,
+  directory,
+  stack,
+}: {
+  projectName: string;
+  directory: string;
+  stack: string;
+}) => {
+  const metadata = await readProjectMetadata({ projectName, directory });
+  const projectInputs = metadata.projectInputs as FullstackAWSProjectOptions;
+  if (projectInputs.includeDb) {
+    console.log('DATABASE_URL=postgres://user:password@host:port/dbname');
+  }
+
+  if (projectInputs.includeStorage) {
+    console.log('S3_BUCKET=my-bucket-name');
+  }
 }
 
 export type FullstackAWSProjectOptions = {

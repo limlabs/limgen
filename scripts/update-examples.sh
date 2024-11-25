@@ -12,6 +12,16 @@ pnpm dev init \
   --includeDb \
   --networkType=public
 
+echo "Updating nextjs-fullstack-aws-private..."
+rm -rf examples/nextjs-fullstack-aws-private/infrastructure
+pnpm dev init \
+  --directory examples/nextjs-fullstack-aws-private \
+  --projectType fullstack-aws \
+  --name nextjs-fullstack-aws-private \
+  --includeStorage \
+  --includeDb \
+  --networkType=private
+
 echo "Updating nextjs-fullstack-aws-vanilla..."
 rm -rf examples/nextjs-fullstack-aws-vanilla/infrastructure examples/nextjs-fullstack-aws-vanilla/Dockerfile examples/nextjs-fullstack-aws-vanilla/.dockerignore
 pnpm dev init \

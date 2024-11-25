@@ -15,7 +15,7 @@ export interface FullstackServiceAWSArgs {
   executionRole?: aws.iam.Role;
   cluster?: aws.ecs.Cluster;
   vpc: awsx.ec2.Vpc;
-  subnetIds?: pulumi.Input<string>[];
+  subnetIds?: pulumi.Input<string[]>;
   securityGroups?: aws.ec2.SecurityGroup[];
   imageArgs?: awsx.ecr.ImageArgs;
   serviceArgs?: awsx.ecs.FargateServiceArgs;
