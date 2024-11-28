@@ -11,9 +11,9 @@ import { z } from 'zod';
  * - 'nextjs': Indicates that the framework is Next.js.
  * - 'unknown': Indicates that the framework is unknown.
  */
-export type FrameworkType = 'nextjs'|'unknown';
+export type FrameworkType = 'nextjs' | 'tanstack-start' | 'unknown';
 
-export const AllFrameworkTypes = ['nextjs', 'unknown'] as const;
+export const AllFrameworkTypes = ['nextjs', 'tanstack-start', 'unknown'] as const;
 
 /**
  * Represents a langauge-specific framework, such as Laravel, Django, or Next.js.
@@ -36,6 +36,7 @@ export interface Framework {
  */
 export const RecognizedProjectFrameworkTypes = {
   'nextjs': ['fullstack-aws'],
+  'tanstack-start': ['fullstack-aws'],
   'unknown': AllProjectTypes,
 } as const;
 
@@ -47,10 +48,14 @@ export const RecognizedProjectFrameworkTypes = {
 export async function detectFramework(): Promise<FrameworkType> {
   const packageJSON = await fs.readFile('package.json', 'utf-8');
   const packageJSONParsed = JSON.parse(packageJSON);
-  
+
   // check for next in dependencies
   if (packageJSONParsed.dependencies['next']) {
     return 'nextjs';
+  }
+
+  if (packageJSONParsed.dependencies['@tanstack/start']) {
+    return 'tanstack-start';
   }
 
   return 'unknown';
