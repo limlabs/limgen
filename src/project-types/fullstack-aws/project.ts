@@ -6,7 +6,7 @@ import fs from 'fs/promises';
 import { initOptionsSchema } from '../../commands/init';
 import { cliBoolean, cliEnum, cliInteger } from '../../schema';
 import { fileExists } from '../../files';
-import { readProjectMetadata } from '../../project';
+import { BaseProjectInputOptions, readProjectMetadata } from '../../project';
 import { execPromise } from '../../utils/exec';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
@@ -167,7 +167,8 @@ export const envPull = async ({
   await fs.writeFile('.env', Object.entries(properties).map(([key, value]) => `${key}=${value}`.trim()).join('\n'));
 }
 
-export type FullstackAWSProjectOptions = {
+export type FullstackAWSProjectOptions = BaseProjectInputOptions & {
+  projectName: string;
   includeStorage: boolean;
   includeDb: boolean;
   networkType: 'public' | 'private';
@@ -178,6 +179,7 @@ export default async function fullstackAWSProject(inputs: FullstackAWSProjectOpt
   const [indexContents] = await Promise.all([
     renderIndex(inputs),
     updateDockerignore(),
+    ensureTunnelScript(inputs),
   ]);
 
   return indexContents;
@@ -206,4 +208,36 @@ infrastructure/`.trim());
 
 export const renderIndex = async (inputs: FullstackAWSProjectOptions) => {
   return ejs.renderFile(path.join(__dirname, 'index.ejs.t'), inputs);
+}
+
+export const ensureTunnelScript = async (inputs: FullstackAWSProjectOptions) => {
+  if (!(inputs.includeDb && inputs.networkType === 'private')) {
+    return;
+  }
+
+  // copy the scripts from the scripts folder
+  await fs.mkdir('infrastructure/scripts', { recursive: true });
+  await fs.copyFile(path.join(__dirname, 'scripts', 'db-tunnel.sh'), 'infrastructure/scripts/db-tunnel.sh');
+
+  // does the current working directory contain a package.json file?
+  if (await fileExists('package.json')) {
+    // read the package.json file
+    const packageJson = JSON.parse(await fs.readFile('package.json', 'utf-8'));
+
+    // add the start script
+    packageJson.scripts = packageJson.scripts || {};
+
+    if (packageJson.scripts.tunnel) {
+      // TODO: Is there something better than a dead-end here we can help the user with?
+      // What if their tunnel script is different?
+      // What if it's outdated version and they want to update it?
+      // What they have multiple tunnels they need to manage?
+      return;
+    }
+
+    packageJson.scripts.tunnel = `infrastructure/scripts/db-tunnel.sh ${inputs.projectName}`;
+
+    // write the package.json file
+    await fs.writeFile('package.json', JSON.stringify(packageJson, null, 2));
+  }
 }

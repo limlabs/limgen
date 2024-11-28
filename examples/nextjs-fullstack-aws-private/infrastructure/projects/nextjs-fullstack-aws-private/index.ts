@@ -73,3 +73,4 @@ export const objectStorageBucket = storage.bucket.bucket;
 export const dbCluster = db.dbCluster.clusterIdentifier;
 export const dbSecret = db.connectionStringSecret.arn;
 export const bastionInstanceId = bastion.instance.id;
+export const dbEndpoint = db.dbCluster.endpoint;

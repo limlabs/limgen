@@ -79,4 +79,5 @@ export const cdnHostname = pulumi.interpolate`https://${cdn.distribution.domainN
 export const objectStorageBucket = storage.bucket.bucket;<% } %><% if (includeDb) { %>
 export const dbCluster = db.dbCluster.clusterIdentifier;
 export const dbSecret = db.connectionStringSecret.arn;<% } %><% if (networkType === 'private' && includeDb) { %>
-export const bastionInstanceId = bastion.instance.id;<% } %>
+export const bastionInstanceId = bastion.instance.id;
+export const dbEndpoint = db.dbCluster.endpoint;<% } %>

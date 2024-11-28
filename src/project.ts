@@ -14,6 +14,12 @@ import { parseYaml } from "./yaml";
  */
 export type ProjectType = 'fullstack-aws';
 
+
+export type BaseProjectInputOptions = {
+  projectName: string;
+  projectType: ProjectType;
+}
+
 /**
  * Represents information about the dependencies of a project.
  * 
@@ -118,10 +124,6 @@ export async function ensureProjectFolder(projectName: string) {
   await fs.mkdir(path.join('infrastructure', 'projects', projectName), { recursive: true });
 }
 
-export interface ProjectIndexFileOptions {
-  projectName: string;
-  inputs: any;
-}
 
 /**
  * Generates the index file for the given project.
@@ -130,7 +132,7 @@ export interface ProjectIndexFileOptions {
  * @param opts - Options to be passed to the project's default method.
  * @returns A promise that resolves when the index file has been written.
  */
-export async function generateIndexFile(project: LimgenProject, inputs: any) {
+export async function applyProject(project: LimgenProject, inputs: any) {
   await ensureProjectFolder(inputs.projectName);
   const result = await project.default(inputs);
 
@@ -184,10 +186,10 @@ export async function renderProject(cmdArgs: z.infer<typeof initOptionsSchema>, 
 
   await Promise.all([
     copyFileDependencies(files),
-    generateIndexFile(project, inputs),
     generatePackageJSON().then(() => installDependencies(cmdArgs.directory, packages)),
     generateTSConfig(),
     generateProjectYaml(inputs),
+    applyProject(project, inputs),
   ])
 }
 
