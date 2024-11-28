@@ -205,5 +205,5 @@ infrastructure/`.trim());
 }
 
 export const renderIndex = async (inputs: FullstackAWSProjectOptions) => {
-  return ejs.renderFile(path.join(__dirname, 'template.ejs.t'), inputs);
+  return ejs.renderFile(path.join(__dirname, 'index.ejs.t'), inputs);
 }
