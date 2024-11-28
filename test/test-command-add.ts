@@ -1,14 +1,10 @@
 
 import fs from 'fs/promises';
-import { describe, it } from "node:test";
+import { before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert";
 import { add as command } from "@/commands/add";
 
 describe('add command', async () => {
-  await fs.mkdir('test/output/test-command-add', { recursive: true });
-  await fs.writeFile('test/output/test-command-add/package.json', JSON.stringify({ name: 'test' }));
-  process.chdir('test/output/test-command-add');
-
   // @ts-ignore
   process.exit = () => { };
 
@@ -40,9 +36,18 @@ describe('add command', async () => {
   });
 
   it('should add the component if it exists', async () => {
+    try {
+      await fs.rmdir('test/output/test-command-add', { recursive: true });
+    } catch {
+      // ignore
+    }
+    
+    await fs.mkdir('test/output/test-command-add/infrastructure', { recursive: true });
+    await fs.writeFile('test/output/test-command-add/infrastructure/package.json', JSON.stringify({ name: 'test' }));
+
     let error = null;
     try {
-      await command.parseAsync(['node', 'add', 'storage-s3']);
+      await command.parseAsync(['node', 'add', 'storage-s3', '--directory', 'test/output/test-command-add']);
     } catch (err) {
       error = err;
     }

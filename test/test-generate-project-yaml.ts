@@ -29,12 +29,12 @@ config:
     value:
       pulumi:template: aws-typescript
 limgen:
-    projectName: my-project
-    projectType: aws-fullstack
-    framework: aws
-    projectInputs:
-      includeStorage: false
-      includeDb: false
+  projectName: my-project
+  projectType: aws-fullstack
+  framework: aws
+  projectInputs:
+    includeStorage: false
+    includeDb: false
 
 `.trimStart());
   });

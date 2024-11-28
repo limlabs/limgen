@@ -5,11 +5,15 @@ import fs from "node:fs/promises";
 
 import { readProjectMetadata } from "@/project";
 
-describe('project', () => {
+describe('project', async () => {
+  await fs.mkdir('test/output/read-project-metadata', { recursive: true });
+  process.chdir('test/output/read-project-metadata');
+
   describe('read project metadata', () => {
     test('should read project metadata from a project file', async () => {
-      await fs.mkdir('test/output/read-project-metadata/infrastructure/my-project', { recursive: true });
-      await fs.writeFile('test/output/read-project-metadata/infrastructure/my-project/Pulumi.yaml', `
+      
+      await fs.mkdir('infrastructure/projects/my-project', { recursive: true });
+      await fs.writeFile('infrastructure/projects/my-project/Pulumi.yaml', `
 name: nextjs-fullstack-aws
 description: A pulumi project created with limgen
 runtime:
@@ -17,22 +21,21 @@ runtime:
   options:
     packagemanager: pnpm
 config:
-  limgen:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-typescript
+limgen:
     projectName: my-project
     projectType: aws-fullstack
     framework: aws
     projectInputs:
       includeStorage: false
       includeDb: false
-  pulumi:tags:
-    value:
-      pulumi:template: aws-typescript
 
 `.trimStart());
 
       const metadata = await readProjectMetadata({
         projectName: 'my-project',
-        directory: 'test/output/read-project-metadata',
       });
 
       assert.equal(metadata.projectName, 'my-project');
