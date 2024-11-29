@@ -240,21 +240,27 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 ## TODOS
 
-Like to have:
+Launch Roadmap:
 
-- Pipelines
-- Documentation site
-- Automatically detect / select whether to include storage or db
-- Prettier integration
 - Static site aws project
 - NextJS static site example
+- Automatically detect / select whether to include storage or db
+- Tanstack storage example
+- Pipelines - GH Actions
+- Pull request checks
+- Documentation site
+- E2E tests
+- Contributor Code of Conduct
+- Prettier integration
+- VueJS 3 static site example
 - Only copy dependencies that are needed
 - Extensibility - allow custom-defined frameworks, projects, workspaces using a standard lifecycle appropriate to each resource type.
+- Example - Laravel
+- Example - Django
 
-Help Wanted:
+Future:
 
 - Multiple language support
-- Example - Laravel
 - DB Provider - Prisma
 - DB Provider - Supabase
 - DB Provider - Vercel
@@ -263,7 +269,8 @@ Help Wanted:
 - App Provider - Fly.io
 - App Provider - Netlify
 - App Provider - Vercel
-- App Provider - Azure AKS
+- App Provider - Azure ACS
+- App Provider - Kubernetes
 - Storage Provider - Vercel
 - Storage Provider - Tigris
 - CDN Provider - Cloudflare
