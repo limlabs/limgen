@@ -28,8 +28,6 @@ bastionInstanceId=$(echo $pulumiOutput | jq -r '.bastionInstanceId')
 dbEndpoint=$(echo $pulumiOutput | jq -r '.dbEndpoint')
 dbPort=5432
 
-echo "dbEndpoint: $dbEndpoint"
-
 # Create SSH tunnel using AWS SSM
 echo "Creating tunnel to database using AWS SSM..."
 aws ssm start-session \

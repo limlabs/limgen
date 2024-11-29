@@ -14,6 +14,10 @@ export async function copyFileDependencies(files: string[]) {
   }
 }
 
+export async function mkdirp(dir: string) {
+  await fs.mkdir(dir, { recursive: true });
+}
+
 export async function fileExists(filePath: string) {
   try {
     await fs.access(filePath);

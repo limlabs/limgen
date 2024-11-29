@@ -54,3 +54,10 @@ pnpm dev init \
   --includeStorage=false \
   --includeDb=false \
   --networkType=public
+
+echo "Updating nextjs-staticsite-aws..."
+rm -rf examples/nextjs-staticsite-aws/infrastructure
+pnpm dev init \
+  --directory examples/nextjs-staticsite-aws \
+  --projectType staticsite-aws \
+  --name nextjs-staticsite-aws

@@ -39,6 +39,10 @@ const updateDockerignore = async () => {
 
   const outputToAppend = depsToCheck.filter(dep => !contents.includes(dep)).join('\n');
 
+  if (outputToAppend.length === 0) {
+    return;
+  }
+  
   await fs.appendFile('.dockerignore', `\n${outputToAppend}`);
 }
 

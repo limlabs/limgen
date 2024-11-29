@@ -12,7 +12,7 @@ import { parseYaml } from "./yaml";
  * 
  * Currently, the only supported project type is 'fullstack-aws'.
  */
-export type ProjectType = 'fullstack-aws';
+export type ProjectType = 'fullstack-aws'|'staticsite-aws';
 
 
 export type BaseProjectInputOptions = {
@@ -101,7 +101,7 @@ export type LimgenProject<TOpts = unknown> = {
  * An array containing all possible project types.
  * Currently, it includes only 'fullstack-aws'.
  */
-export const AllProjectTypes = ['fullstack-aws'] as const;
+export const AllProjectTypes = ['fullstack-aws', 'staticsite-aws'] as const;
 
 /**
  * Imports a project module dynamically based on the provided project type.

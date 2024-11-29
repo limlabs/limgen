@@ -35,7 +35,7 @@ export interface Framework {
  * @property {ProjectType[]} unknown - Represents all project types associated with an unknown framework.
  */
 export const RecognizedProjectFrameworkTypes = {
-  'nextjs': ['fullstack-aws'],
+  'nextjs': ['fullstack-aws', 'staticsite-aws'],
   'tanstack-start': ['fullstack-aws'],
   'unknown': AllProjectTypes,
 } as const;

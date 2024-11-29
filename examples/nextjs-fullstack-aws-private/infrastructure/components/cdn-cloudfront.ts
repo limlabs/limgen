@@ -6,8 +6,9 @@ import { prefixed } from "../utils/prefixed";
 import { deepMerge } from "../utils/deep-merge";
 
 export interface CdnCloudFrontArgs {
-  lb: awsx.lb.ApplicationLoadBalancer,
+  lb?: awsx.lb.ApplicationLoadBalancer,
   storage?: aws.s3.BucketV2,
+  storagePathPattern?: string,
   cloudFrontDistributionArgs?: aws.cloudfront.DistributionArgs
 }
 
@@ -33,8 +34,16 @@ export class CdnCloudFront extends pulumi.ComponentResource {
   }
   getDistribution(): aws.cloudfront.Distribution {
     let orderedCacheBehaviors = [];
-    const origins: aws.types.input.cloudfront.DistributionOrigin[] = [
-      {
+    const origins: aws.types.input.cloudfront.DistributionOrigin[] = []
+
+    if (!this._args.lb && !this._args.storage) {
+      throw new Error("At least one of lb or storage is required to create a CloudFront distribution");
+    }
+
+    let defaultCacheBehavior;
+
+    if (this._args.lb) {
+      origins.push({
         domainName: this._args.lb.loadBalancer.dnsName,
         originId: prefixed("lb-origin"),
         customOriginConfig: {
@@ -43,8 +52,23 @@ export class CdnCloudFront extends pulumi.ComponentResource {
           httpsPort: 443,
           originSslProtocols: ["TLSv1.2"],
         },
-      },
-    ]
+      });
+
+      defaultCacheBehavior = {
+        targetOriginId: prefixed("lb-origin"),
+        viewerProtocolPolicy: "redirect-to-https",
+        allowedMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"],
+        cachedMethods: ["GET", "HEAD"],
+        compress: true,
+        forwardedValues: {
+          queryString: true,
+          headers: ["*"],
+          cookies: {
+            forward: "all"
+          }
+        },
+      }
+    }
 
     if (this._args.storage) {
       origins.push({
@@ -56,7 +80,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
       });
 
       orderedCacheBehaviors.push({
-        pathPattern: "/media/*",
+        pathPattern: this._args.storagePathPattern || "/media/*",
         targetOriginId: prefixed("storage-origin"),
         allowedMethods: ["GET", "HEAD", "OPTIONS"],
         cachedMethods: ["GET", "HEAD"],
@@ -71,27 +95,32 @@ export class CdnCloudFront extends pulumi.ComponentResource {
           },
         },
       });
+
+      if (!defaultCacheBehavior) {
+        defaultCacheBehavior = {
+          targetOriginId: prefixed("storage-origin"),
+          viewerProtocolPolicy: "redirect-to-https",
+          allowedMethods: ["GET", "HEAD", "OPTIONS"],
+          cachedMethods: ["GET", "HEAD"],
+          forwardedValues: {
+            headers: [],
+            queryStringCacheKeys: [],
+            queryString: false,
+            cookies: {
+              forward: "none"
+            },
+          },
+        }
+      }
     }
 
     return new aws.cloudfront.Distribution("CloudFrontDistribution", deepMerge({
       enabled: true,
       origins,
       orderedCacheBehaviors,
-      defaultCacheBehavior: {
-        targetOriginId: prefixed("lb-origin"),
-        viewerProtocolPolicy: "redirect-to-https",
-        allowedMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"],
-        cachedMethods: ["GET", "HEAD"],
-        compress: true,
-        forwardedValues: {
-          queryString: true,
-          headers: ["*"],
-          cookies: {
-            forward: "all"
-          }
-        },
-      },
+      defaultCacheBehavior,
       priceClass: "PriceClass_100",
+      defaultRootObject: "index.html",
       viewerCertificate: {
         cloudfrontDefaultCertificate: true,
       },

@@ -247,6 +247,8 @@ Launch Roadmap:
 - Automatically detect / select whether to include storage or db
 - Tanstack storage example
 - Pipelines - GH Actions
+- Hostname configuration
+- Support multiple frameworks
 - Pull request checks
 - Documentation site
 - E2E tests
@@ -260,6 +262,7 @@ Launch Roadmap:
 
 Future:
 
+- Foundation concept - platform
 - Multiple language support
 - DB Provider - Prisma
 - DB Provider - Supabase
