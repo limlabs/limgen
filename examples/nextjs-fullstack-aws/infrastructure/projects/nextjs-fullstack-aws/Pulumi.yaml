@@ -16,4 +16,5 @@ limgen:
     includeDb: true
     networkType: public
     port: unknown
+    storageAccess: public
 

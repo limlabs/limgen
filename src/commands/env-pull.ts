@@ -20,7 +20,7 @@ export const envPull = new Command()
   .description('Pull project environment variables into a local .env file')
   .option('-p, --projectName <project>', 'Name of the project to pull environment variables from')
   .option('-s, --stack <stack>', 'Name of the stack to pull environment variables from')
-  .option('-d, --directory <directory>', 'Directory for the base infrastructure folder where the component should be added')
+  .option('-d, --directory <directory>', 'Directory for the base infrastructure folder')
   .action(async (options: any) => {
     const cmdArgs = envPullOptionsSchema.parse({ options });
     if (options.directory) {

@@ -63,6 +63,11 @@ export const inputs = async () => {
       schema: cliEnum(['public', 'private', 'unknown']).optional(),
     },
     {
+      name: 'storageAccess',
+      messsage: 'Storage access',
+      schema: cliEnum(['private', 'public', 'unknown']).optional(),
+    },
+    {
       name: 'port',
       message: 'Port to expose',
       schema: cliInteger().optional().default('3000'),
@@ -85,6 +90,24 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
     includeStorage = answer.includeStorage;
   } else {
     includeStorage = projectArgs.includeStorage === 'true';
+  }
+
+  let storageAccess = projectArgs.storageAccess;
+  if (includeStorage && projectArgs.storageAccess === 'unknown') {
+    const answer = await prompts(
+      {
+        type: 'select',
+        name: 'storageAccess',
+        message: 'Storage access',
+        choices: [
+          { title: 'Public (useful for static content / media)', value: 'public' },
+          { title: 'Private (better for sensitive / personal data)', value: 'private' },
+        ],
+        initial: 0,
+      }
+    );
+
+    storageAccess = answer.storageAccess;
   }
 
   let includeDb;
@@ -126,6 +149,7 @@ export const collectInput = async (cmdArgs: z.infer<typeof initOptionsSchema>, p
     includeDb,
     networkType,
     port: projectArgs.port,
+    storageAccess,
   };
 }
 
@@ -145,7 +169,7 @@ export const envPull = async ({
     const { stdout: BUCKET_NAME } = await execPromise(
       `pulumi stack output objectStorageBucket --stack ${stack}`,
       { cwd: path.join('infrastructure', 'projects', projectName) });
-      
+
     Object.assign(properties, { BUCKET_NAME });
   }
 
@@ -172,6 +196,7 @@ export type FullstackAWSProjectOptions = BaseProjectInputOptions & {
   includeStorage: boolean;
   includeDb: boolean;
   networkType: 'public' | 'private';
+  storageAccess?: 'public' | 'private';
   port: string;
 };
 

@@ -24,7 +24,7 @@ const db = new PostgresRdsCluster('Database', {
   vpc,
 });<% } %>
 const cdn = new CdnCloudFront('CDN', {
-  lb: lb.lb,<% if (includeStorage) { %>
+  lb: lb.lb,<% if (includeStorage && storageAccess === 'public') { %>
   storage: storage.bucket,<% } %>
 });<% if (networkType === 'private') { %>
 const appSecurityGroup = new aws.ec2.SecurityGroup('AppSecurityGroup', {

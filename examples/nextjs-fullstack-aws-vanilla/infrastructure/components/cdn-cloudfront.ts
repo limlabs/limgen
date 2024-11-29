@@ -15,15 +15,15 @@ export class CdnCloudFront extends pulumi.ComponentResource {
   _args: CdnCloudFrontArgs;
 
   distribution: aws.cloudfront.Distribution;
-  originAccessIdentity: aws.cloudfront.OriginAccessIdentity;
+  originAccessIdentity: aws.cloudfront.OriginAccessIdentity | null = null;
   originBucketPolicy: aws.s3.BucketPolicy | null = null;
 
   constructor(name: string = 'CDN', args: CdnCloudFrontArgs, opts?: pulumi.ComponentResourceOptions) {
     super("limgen:CloudFrontComponent", name, {}, opts);
     this._args = args;
-    this.originAccessIdentity = this.getOriginAccessIdentity();
-
+    
     if (this._args.storage) {
+      this.originAccessIdentity = this.getOriginAccessIdentity();
       this.originBucketPolicy = this.getOriginBucketPolicy();
     }
 
@@ -51,7 +51,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
         domainName: this._args.storage.bucketRegionalDomainName,
         originId: prefixed("storage-origin"),
         s3OriginConfig: {
-          originAccessIdentity: this.originAccessIdentity.cloudfrontAccessIdentityPath,
+          originAccessIdentity: this.originAccessIdentity!.cloudfrontAccessIdentityPath,
         },
       });
 
@@ -111,7 +111,7 @@ export class CdnCloudFront extends pulumi.ComponentResource {
       bucket: this._args.storage.id,
       policy: pulumi.all([
         this._args.storage.arn,
-        this.originAccessIdentity.iamArn
+        this.originAccessIdentity!.iamArn
       ]).apply(([storageArn, iamArn]) => JSON.stringify({
         Version: "2012-10-17",
         Statement: [

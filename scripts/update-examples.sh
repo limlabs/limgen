@@ -9,6 +9,7 @@ pnpm dev init \
   --projectType fullstack-aws \
   --name nextjs-fullstack-aws \
   --includeStorage \
+  --storageAccess=public \
   --includeDb \
   --networkType=public
 
@@ -18,6 +19,7 @@ pnpm dev init \
   --directory examples/nextjs-fullstack-aws-private \
   --projectType fullstack-aws \
   --name nextjs-fullstack-aws-private \
+  --storageAccess=public \
   --includeStorage \
   --includeDb \
   --networkType=private

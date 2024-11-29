@@ -16,4 +16,5 @@ limgen:
     includeDb: false
     networkType: public
     port: 9000
+    storageAccess: unknown
 

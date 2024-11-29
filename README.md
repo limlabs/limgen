@@ -176,19 +176,34 @@ The following options only apply to their respective project types, provided int
 
 - **port** - the port to listen on. If a `Dockerfile` is detected in `${directory}`, it will default to using the value of the Docker [`EXPOSE` instruction](https://docs.docker.com/reference/dockerfile/#expose).
 - **includeStorage** - whether to include object storage or not. When set to `true`, an S3 bucket will be created that is available from your application's URL under the root path `/storage`. Defaults to prompt for confirmation.
+- **storageAccess** - when `includeStorage` is set to `true`, determines whether S3 bucket can be access from the public internet or not. If set to `public`, the contents of the S3 bucket will be available via the URL `<outputs.cdnHostname>/<S3Key>`, where `outputs.cdnHostname` is the value obtained from running `pulumi stack output` in the `infrastructure/projects/<projectName>` folder. Defaults to prompt for confirmation, skipped if `includeStorage` is `false`.
 - **includeDb** - whether to include a database or not. If set to `true`, includes the resources to create an [RDS Postgres](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) server in AWS. Currenty only RDS Postgres is supported, but more cloud providers and datbase types will be added soon. Default to prompt for confirmation.
 
 #### `add`
 
 ```
-npx add <component> [options]
+npx limgen add <component> [options]
 ```
 
 Adds a new component to the `infrastructure/components` folder. Components are usually imported into one or more projects inside the `infrastructure/projects` folder and used alongside other resources from `@pulumi/aws`, `@pulumi/awsx` and others directly.
 
-**Arguments**
+##### Arguments
 
 - `<component>` - the name of a component to add to your workspace. Supported components can be found [here](./src/components/)
+
+#### `env-pull`
+
+```
+npx limgen env-pull [options]
+```
+
+Pulls known environment variables from a project and writes them to `.env` locally. 
+
+##### Options
+
+- **projectName** - The name of the limgen-created project to pull environment variables from. Defaults to prompting based on available projects in the `infrastructure/projects` folder.
+- **stack** - The name of the Pulumi stack to pull environment variables from. Defaults to prompting from Pulumi to obtain select the environment
+- **directory** - Directory for the base infrastructure folder. Defaults to current working directory.
 
 ## Local Development
 
@@ -225,12 +240,11 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 ## TODOS
 
-Must have:
-
-- [ ] Cloudfront --> S3 configuration
-
 Like to have:
 
+- Pipelines
+- Documentation site
+- Automatically detect / select whether to include storage or db
 - Prettier integration
 - Static site aws project
 - NextJS static site example
