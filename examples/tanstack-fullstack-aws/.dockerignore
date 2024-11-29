@@ -10,3 +10,4 @@ infrastructure/*.log
 .vinxi
 .DS_Store
 .output
+/data

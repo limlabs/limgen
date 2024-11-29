@@ -1,13 +1,8 @@
 import fs from 'fs/promises'
-
+import { fileExists } from './files'
 
 export const dockerfileExists = async () => {
-  try {
-    await fs.access('Dockerfile')
-    return true
-  } catch (error) {
-    return false
-  }
+  return await fileExists('Dockerfile')
 }
 
 export const getDockerfilePort = async () => {

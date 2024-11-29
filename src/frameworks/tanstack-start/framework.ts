@@ -1,34 +1,16 @@
-import { dockerfileExists, getDockerfilePort } from "../../docker";
-import { cliInteger } from "../../schema";
-import ejs from "ejs";
+import { fileExists } from "@/files";
+import { dockerfileExists } from "../../docker";
 import fs from "fs/promises";
 
 export const inputs = async (cmdArgs: any, projectInput: any) => {
-  return [
-    {
-      name: 'port',
-      message: 'Port to expose',
-      schema: cliInteger().optional(),
-    }
-  ]
+  return []
 }
 
 export const collectInput = async (cmdArgs: any, projectInput: any, frameworkArgs: any) => {
-  let port = frameworkArgs.port;
-  if (!port || port === 'unknown') {
-    const dockerfilePort = await getDockerfilePort();
-    if (dockerfilePort === null) {
-      port = 3000;
-    }
-  }
-
-  return {
-    port,
-  }
+  return {}
 }
 
 export interface TanstackStartFrameworkInput {
-  port: number;
 }
 
 export default async function tanstackStartFramework(opts: TanstackStartFrameworkInput) {
@@ -40,6 +22,10 @@ export default async function tanstackStartFramework(opts: TanstackStartFramewor
 }
 
 const updateDockerignore = async () => {
+  if (!await fileExists('.dockerignore')) {
+    await fs.writeFile('.dockerignore', '');
+  }
+
   const contents = await fs.readFile('.dockerignore', 'utf-8');
   const depsToCheck = [
     'node_modules',
@@ -48,11 +34,12 @@ const updateDockerignore = async () => {
     '.git',
     '.DS_Store',
     '.output',
+    '/data',
   ];
 
   const outputToAppend = depsToCheck.filter(dep => !contents.includes(dep)).join('\n');
 
-  await fs.appendFile('.dockerignore', outputToAppend);
+  await fs.appendFile('.dockerignore', `\n${outputToAppend}`);
 }
 
 const ensureDockerfile = async (opts: TanstackStartFrameworkInput) => {
@@ -61,8 +48,7 @@ const ensureDockerfile = async (opts: TanstackStartFrameworkInput) => {
   }
 
   try {
-    const result = await ejs.renderFile(`${__dirname}/Dockerfile.ejs.t`, opts)
-    await fs.writeFile('Dockerfile', result)
+    await fs.copyFile(`${__dirname}/Dockerfile`, 'Dockerfile');
   } catch (error) {
     console.error('Unable to render Dockerfile', error)
     throw error
