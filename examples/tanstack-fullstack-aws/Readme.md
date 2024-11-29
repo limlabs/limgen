@@ -82,6 +82,15 @@ To understand what's happening to help your app get deployed through limgen, use
     ```
 
 1. Make sure you are [logged into the AWS CLI](https://docs.aws.amazon.com/signin/latest/userguide/command-line-sign-in.html).
+1. Make sure you have installed [Pulumi](https://www.pulumi.com/):
+
+
+      ```bash
+      # A one-line command to install Pulumi in macOS / linux
+      curl -fsSL https://get.pulumi.com | sh 
+      ```
+
+
 1. Change directories into the Pulumi project we created earlier, and run `pulumi up` to start your stack:
 
     ```bash
@@ -126,3 +135,10 @@ cd infrastructure/projects/<myapp>/
 # Select and update your existing stack
 pulumi up
 ```
+
+### Caveats
+
+This example does not have persistent storage. This means it will not work with more than one task instance. The count will also be reset across deployments.
+
+To allow for persistent storage, consider using the `object-storage-s3` component by running `npx limgen add object-storage-s3`. This creates a private storage bucket in S3 your app can use to read/write files. Configuring this component and making the changees to your app to support the aws-sdk are currently outside the scope of this guide.
+
