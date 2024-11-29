@@ -60,7 +60,7 @@ export const inputs = async () => {
     {
       name: 'networkType',
       message: 'Network type',
-      schema: cliEnum(['public', 'private']).optional(),
+      schema: cliEnum(['public', 'private', 'unknown']).optional(),
     },
     {
       name: 'port',

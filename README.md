@@ -228,16 +228,13 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 Must have:
 
 - [ ] Cloudfront --> S3 configuration
-- [ ] Private networking option
 
 Like to have:
 
 - Prettier integration
 - Static site aws project
 - NextJS static site example
-- Resource - Bastion
 - Only copy dependencies that are needed
-- Project Option - Private Networking
 - Extensibility - allow custom-defined frameworks, projects, workspaces using a standard lifecycle appropriate to each resource type.
 
 Help Wanted:
