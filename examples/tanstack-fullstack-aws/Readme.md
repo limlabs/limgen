@@ -38,47 +38,7 @@ To understand what's happening to help your app get deployed through limgen, use
     // This is the only actual change to the original example
     const filePath = path.join('data', 'count.txt')
 
-    async function readCount() {
-      return parseInt(
-        await fs.promises.readFile(filePath, 'utf-8').catch(() => '0'),
-      )
-    }
-
-    const getCount = createServerFn({
-      method: 'GET',
-    }).handler(() => {
-      return readCount()
-    })
-
-    const updateCount = createServerFn({ method: 'POST' })
-      .validator((d: number) => d)
-      .handler(async ({ data }) => {
-        const count = await readCount()
-        await fs.promises.writeFile(filePath, `${count + data}`)
-      })
-
-    export const Route = createFileRoute('/')({
-      component: Home,
-      loader: async () => await getCount(),
-    })
-
-    function Home() {
-      const router = useRouter()
-      const state = Route.useLoaderData()
-
-      return (
-        <button
-          type="button"
-          onClick={() => {
-            updateCount({ data: 1 }).then(() => {
-              router.invalidate()
-            })
-          }}
-        >
-          Add 1 to {state}?
-        </button>
-      )
-    }
+    // ... Rest of exsiting code
     ```
 
 1. Make sure you are [logged into the AWS CLI](https://docs.aws.amazon.com/signin/latest/userguide/command-line-sign-in.html).
@@ -140,5 +100,5 @@ pulumi up
 
 This example does not have persistent storage. This means it will not work with more than one task instance. The count will also be reset across deployments.
 
-To allow for persistent storage, consider using the `object-storage-s3` component by running `npx limgen add object-storage-s3`. This creates a private storage bucket in S3 your app can use to read/write files. Configuring this component and making the changes to your app to support the aws-sdk are currently outside the scope of this guide.
+To allow for persistent storage, consider using the `object-storage-s3` component by running `npx limgen add storage-s3`. This creates a private storage bucket in S3 your app can use to read/write files. Configuring this component and making the changes to your app to support the aws-sdk are currently outside the scope of this guide.
 
