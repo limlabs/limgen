@@ -140,5 +140,5 @@ pulumi up
 
 This example does not have persistent storage. This means it will not work with more than one task instance. The count will also be reset across deployments.
 
-To allow for persistent storage, consider using the `object-storage-s3` component by running `npx limgen add object-storage-s3`. This creates a private storage bucket in S3 your app can use to read/write files. Configuring this component and making the changees to your app to support the aws-sdk are currently outside the scope of this guide.
+To allow for persistent storage, consider using the `object-storage-s3` component by running `npx limgen add object-storage-s3`. This creates a private storage bucket in S3 your app can use to read/write files. Configuring this component and making the changes to your app to support the aws-sdk are currently outside the scope of this guide.
 
