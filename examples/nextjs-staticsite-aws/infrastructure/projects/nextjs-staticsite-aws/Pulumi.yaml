@@ -11,4 +11,6 @@ config:
 limgen:
   projectName: nextjs-staticsite-aws
   projectType: staticsite-aws
+  projectInputs:
+    outputDir: out
 

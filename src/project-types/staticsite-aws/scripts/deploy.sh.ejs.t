@@ -20,5 +20,5 @@ pulumiOutput=$(pulumi stack output --json)
 # Extract necessary values from Pulumi output
 bucketName=$(echo $pulumiOutput | jq -r '.bucketName')
 
-aws s3 sync ../../../out/ s3://$bucketName
+aws s3 sync ../../../<%=outputDir %>/ s3://$bucketName
 )

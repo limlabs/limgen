@@ -1,6 +1,9 @@
+import { BaseProjectInputOptions } from '@/project'
 import { fileExists, mkdirp } from '../../files'
 import fs from 'fs/promises'
 import path from 'path'
+import { z } from 'zod'
+import ejs from 'ejs'
 
 export const dependsOn = () => {
   const files = [
@@ -24,27 +27,46 @@ export const dependsOn = () => {
 }
 
 export const inputs = async () => {
-  return []
+  return [
+    {
+      name: 'outputDir',
+      message: 'Build output directory',
+      schema: z.string().default('out'),
+    }
+  ]
 }
 
-export const collectInput = async () => {
-  return {}
+interface StaticSiteAwsProjectInputOptions extends BaseProjectInputOptions {
+  outputDir: string
 }
 
-export default async function staticSiteAws() {
+export const collectInput = async (cmdArgs: any, projectArgs: any) => {
+  let outputDir = projectArgs.outputDir
+  if (!outputDir || outputDir === 'unknown') {
+    outputDir = 'out'
+  }
+  
+  return {
+    outputDir,
+  }
+}
+
+export default async function staticSiteAws(input: StaticSiteAwsProjectInputOptions) {
   const [pulumiIndex] = await Promise.all([
     fs.readFile(path.join(__dirname, 'index.ts'), 'utf-8'),
-    copyScripts(),
+    copyScripts(input),
     ensureDeployCommand(),
   ])
 
   return pulumiIndex
 }
 
-export const copyScripts = async () => {
+export const copyScripts = async (input: StaticSiteAwsProjectInputOptions) => {
   const scriptsPath = path.join('infrastructure', 'scripts')
   await mkdirp(scriptsPath)
-  await fs.copyFile(path.join(__dirname, 'scripts', 'deploy.sh'), path.join(scriptsPath, 'deploy.sh'))
+
+  const result = await ejs.renderFile(path.join(__dirname, 'scripts', 'deploy.sh.ejs.t'), input)
+  await fs.writeFile(path.join(scriptsPath, 'deploy.sh'), result)
 }
 
 export const ensureDeployCommand = async () => {
