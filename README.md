@@ -250,8 +250,6 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 Launch Roadmap:
 
-- Static site aws project
-- NextJS static site example
 - Automatically detect / select whether to include storage or db
 - Tanstack storage example
 - Pipelines - GH Actions
