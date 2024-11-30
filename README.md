@@ -178,6 +178,14 @@ The following options only apply to their respective project types, provided int
 - **includeStorage** - whether to include object storage or not. When set to `true`, an S3 bucket will be created that is available from your application's URL under the root path `/storage`. Defaults to prompt for confirmation.
 - **storageAccess** - when `includeStorage` is set to `true`, determines whether S3 bucket can be access from the public internet or not. If set to `public`, the contents of the S3 bucket will be available via the URL `<outputs.cdnHostname>/<S3Key>`, where `outputs.cdnHostname` is the value obtained from running `pulumi stack output` in the `infrastructure/projects/<projectName>` folder. Defaults to prompt for confirmation, skipped if `includeStorage` is `false`.
 - **includeDb** - whether to include a database or not. If set to `true`, includes the resources to create an [RDS Postgres](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) server in AWS. Currenty only RDS Postgres is supported, but more cloud providers and datbase types will be added soon. Default to prompt for confirmation.
+- **networkType** - The type of network to create. 
+    - When set to `public`, only public subnets will be created, and load balancer, ECS Service and database will be routable over the public internet. This is primarily useful for getting started, and for development with non-sensitive data. 
+    - When set to `private`, both private and public subnets will be created. In `private` mode, only the Load Balancer is on the public network; the app and database are restricted to private subnets, which are not accessible from the public internet. Instead, one must use a tunnel, which will be generated automatically alongside the app if a `includeDb=true`.
+    - Defaults to prompting for confirmation.
+
+**`staticsite-aws` Options**
+
+- **outputDir** - the root directory where build output for the static site is located. Defaults to `out`
 
 #### `add`
 
