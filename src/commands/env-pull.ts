@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import path from "path";
 import prompts from "prompts";
 import { spinner } from "@/cli-helpers";
-import { execPromise } from "@/utils/exec";
+import { execPromise } from "@/exec";
 
 const envPullOptionsSchema = z.object({
   project: z.string().optional(),

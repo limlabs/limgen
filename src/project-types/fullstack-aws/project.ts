@@ -7,7 +7,7 @@ import { initOptionsSchema } from '../../commands/init';
 import { cliBoolean, cliEnum, cliInteger } from '../../schema';
 import { fileExists } from '../../files';
 import { BaseProjectInputOptions, readProjectMetadata } from '../../project';
-import { execPromise } from '../../utils/exec';
+import { execPromise } from '../../exec';
 
 export const dependsOn = async (opts: FullstackAWSProjectOptions) => {
   const files: string[] = [
