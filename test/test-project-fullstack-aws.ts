@@ -9,6 +9,9 @@ describe('fullstackAWSProject', () => {
       includeDb: false,
       port: 'unknown',
       networkType: 'public',
+      projectName: 'testProject',
+      projectType: 'fullstack-aws',
+      storageAccess: 'unknown',
     };
     const template = await renderIndex(opts);
     assert(!template.includes('import { StorageS3 }'));
@@ -22,6 +25,9 @@ describe('fullstackAWSProject', () => {
       includeDb: false,
       port: 'unknown',
       networkType: 'public',
+      projectName: 'testProject',
+      projectType: 'fullstack-aws',
+      storageAccess: 'unknown',
     };
     const template = await renderIndex(opts);
     assert.ok(template.includes('import { StorageS3 }'));
@@ -40,6 +46,9 @@ describe('fullstackAWSProject', () => {
       includeDb: true,
       port: 'unknown',
       networkType: 'public',
+      projectName: 'testProject',
+      projectType: 'fullstack-aws',
+      storageAccess: 'unknown',
     };
     const template = await renderIndex(opts);
     assert.ok(template.includes('import { PostgresRdsCluster }'));
@@ -58,6 +67,9 @@ describe('fullstackAWSProject', () => {
       includeDb: true,
       port: 'unknown',
       networkType: 'public',
+      projectName: 'testProject',
+      projectType: 'fullstack-aws',
+      storageAccess: 'unknown',
     };
     const template = await renderIndex(opts);
     assert.ok(template.includes('import { StorageS3 }'));
@@ -76,6 +88,9 @@ describe('fullstackAWSProject', () => {
       includeDb: false,
       port: '8080',
       networkType: 'public',
+      projectName: 'testProject',
+      projectType: 'fullstack-aws',
+      storageAccess: 'unknown',
     };
     const template = await renderIndex(opts);
     assert.ok(template.includes('8080'));

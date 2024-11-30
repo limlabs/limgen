@@ -196,7 +196,7 @@ export type FullstackAWSProjectOptions = BaseProjectInputOptions & {
   includeStorage: boolean;
   includeDb: boolean;
   networkType: 'public' | 'private';
-  storageAccess?: 'public' | 'private';
+  storageAccess: 'public' | 'private'|'unknown';
   port: string;
 };
 
