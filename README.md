@@ -254,20 +254,20 @@ Launch Roadmap:
 - Tanstack storage example
 - Pipelines - GH Actions
 - Hostname configuration
-- Support multiple frameworks
 - Pull request checks
 - Documentation site
-- E2E tests
-- Contributor Code of Conduct
-- Prettier integration
 - VueJS 3 static site example
-- Only copy dependencies that are needed
-- Extensibility - allow custom-defined frameworks, projects, workspaces using a standard lifecycle appropriate to each resource type.
+- Prettier integration
 - Example - Laravel
 - Example - Django
+- Support multiple frameworks
+- E2E tests
+- Contributor Code of Conduct
+- Only copy dependencies that are needed
 
 Future:
 
+- Extensibility - allow custom-defined frameworks, projects, workspaces using a standard lifecycle appropriate to each resource type.
 - Foundation concept - platform
 - Multiple language support
 - DB Provider - Prisma
