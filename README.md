@@ -248,25 +248,29 @@ Updating the examples can be useful as a sort of "integration test" to make sure
 
 ## TODOS
 
-Launch Roadmap:
+MVP Roadmap:
 
-- Automatically detect / select whether to include storage or db
-- Tanstack storage example
-- Pipelines - GH Actions
-- Hostname configuration
-- Pull request checks
-- Documentation site
-- VueJS 3 static site example
-- Prettier integration
+- [LIMGEN-1: Contributor Code of Conduct](https://linear.app/liminal-sh/issue/LIMGEN-1/contributor-code-of-conduct)
+- [LIMGEN-2: Pull request checks](https://linear.app/liminal-sh/issue/LIMGEN-2/pull-request-checks)
+- [LIMGEN-3: Automatically detect / select whether to include storage or db](https://linear.app/liminal-sh/issue/LIMGEN-3/automatically-detect-select-whether-to-include-storage-or-db)
+- [LIMGEN-4: Documentation foundations](https://linear.app/liminal-sh/issue/LIMGEN-4/documentation-foundations)
+- [LIMGEN-5: Tanstack storage example (with S3 integration)](https://linear.app/liminal-sh/issue/LIMGEN-5/tanstack-storage-example-with-s3-integration)
+- [LIMGEN-6: Pipeline file generation](https://linear.app/liminal-sh/issue/LIMGEN-6/pipeline-file-generation)
+- [LIMGEN-7: Hostname configuration](https://linear.app/liminal-sh/issue/LIMGEN-7/hostname-configuration)
+- [LIMGEN-8: Vue 3 static site example](https://linear.app/liminal-sh/issue/LIMGEN-8/vue-3-static-site-example)
 - Example - Laravel
-- Example - Django
-- Support multiple frameworks
+- Example - .Net
+- Support multiple frameworks at once
+    - Needed for Laravel
 - E2E tests
-- Contributor Code of Conduct
 - Only copy dependencies that are needed
+- Lock dep versions
+- Finalize networking privacy user experience / options
 
 Future:
 
+- Redis
+- Django
 - Extensibility - allow custom-defined frameworks, projects, workspaces using a standard lifecycle appropriate to each resource type.
 - Foundation concept - platform
 - Multiple language support
@@ -283,3 +287,4 @@ Future:
 - Storage Provider - Vercel
 - Storage Provider - Tigris
 - CDN Provider - Cloudflare
+- Use AST parsing to modify Next config
