@@ -1,9 +1,0 @@
-{
-  "name": "infrastructure",
-  "version": "1.0.0",
-  "dependencies": {
-    "@pulumi/azure-native": "^2.19.0",
-    "@pulumi/pulumi": "^3.142.0",
-    "zod": "^3.23.8"
-  }
-}

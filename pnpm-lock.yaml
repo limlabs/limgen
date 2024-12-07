@@ -39,6 +39,15 @@ importers:
       '@pulumi/awsx':
         specifier: ^2.18.1
         version: 2.18.1(typescript@4.9.5)
+      '@pulumi/azure-native':
+        specifier: ^2.76.0
+        version: 2.76.0(typescript@4.9.5)
+      '@pulumi/docker':
+        specifier: 4.5.7
+        version: 4.5.7(typescript@4.9.5)
+      '@pulumi/docker-build':
+        specifier: ^0.0.7
+        version: 0.0.7(typescript@4.9.5)
       '@pulumi/pulumi':
         specifier: ^3.138.0
         version: 3.138.0(typescript@4.9.5)
@@ -535,6 +544,12 @@ packages:
 
   '@pulumi/awsx@2.18.1':
     resolution: {integrity: sha512-QK4FCkoS1SJMEzHPM6TOnxtJF88KRO38Vhg7J4g/smjBE1YY4v9VNbpnPecM/j/h9x98BDIjsvyIn0ZdI3S0BA==}
+
+  '@pulumi/azure-native@2.76.0':
+    resolution: {integrity: sha512-qz23H2REIDocV/zbUYXuWdaHfVD3+vYNlL6/GByGdLzbKN+sp/kXVmtHKRGCNrkjCXMSZvxLVGi2LRKc91rZxg==}
+
+  '@pulumi/docker-build@0.0.7':
+    resolution: {integrity: sha512-yiPvQefRS3Z+5NtG5VK2pYTds0pCQh21INpoWY8gKFrqs166ZFVrPrMXelmsjABnmkG5ZNlkHanU7HqAExn55Q==}
 
   '@pulumi/docker@3.6.1':
     resolution: {integrity: sha512-BZME50QkT556v+LvmTXPT8ssB2xxNkp9+msB5xYFEnUnWcdGAx5yUysQw70RJCb+U0GbkJSbxtlgMJgOQf/now==}
@@ -2674,6 +2689,24 @@ snapshots:
       mime: 2.6.0
     transitivePeerDependencies:
       - aws-crt
+      - bluebird
+      - supports-color
+      - ts-node
+      - typescript
+
+  '@pulumi/azure-native@2.76.0(typescript@4.9.5)':
+    dependencies:
+      '@pulumi/pulumi': 3.138.0(typescript@4.9.5)
+    transitivePeerDependencies:
+      - bluebird
+      - supports-color
+      - ts-node
+      - typescript
+
+  '@pulumi/docker-build@0.0.7(typescript@4.9.5)':
+    dependencies:
+      '@pulumi/pulumi': 3.138.0(typescript@4.9.5)
+    transitivePeerDependencies:
       - bluebird
       - supports-color
       - ts-node

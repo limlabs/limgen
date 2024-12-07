@@ -43,7 +43,7 @@ export default async function nextJsFramework(opts: NextJSFrameworkInput) {
 }
 
 const updateDockerignore = async (opts: NextJSFrameworkInput) => {
-  if (opts.projectType !== 'fullstack-aws') {
+  if (!isFullstack(opts.projectType)) {
     return;
   }
 
@@ -54,7 +54,7 @@ const updateDockerignore = async (opts: NextJSFrameworkInput) => {
 }
 
 const ensureDockerfile = async (opts: NextJSFrameworkInput) => {
-  if (opts.projectType !== 'fullstack-aws') {
+  if (!isFullstack(opts.projectType)) {
     return;
   }
 
@@ -87,7 +87,7 @@ const updateNextConfig = async (projectType: ProjectType) => {
   if (nextConfigMatch) {
     // find a section matching output: 'standalone'
     const outputMatch = nextConfig.match(/output: *('|")(.+)('|")/);
-    const desiredOutputType = projectType === 'fullstack-aws' ? 'standalone' : 'export';
+    const desiredOutputType = isFullstack(projectType) ? 'standalone' : 'export';
     if (!outputMatch) {
       const updatedNextConfig = nextConfig.replace(
         /const nextConfig: NextConfig = {/,
@@ -102,3 +102,5 @@ const updateNextConfig = async (projectType: ProjectType) => {
     }
   }
 }
+
+export const isFullstack = (projectType: ProjectType) => projectType.startsWith('fullstack');

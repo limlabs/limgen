@@ -10,10 +10,11 @@ import { parseYaml } from "./yaml";
 /**
  * Represents the type of a project.
  * 
- * Currently, the only supported project type is 'fullstack-aws'.
+ * 'fullstack-aws' - A fullstack project using AWS Fargate.
+ * 'staticsite-aws' - A static site project using AWS services.
+ * 'fullstack-azure' - A fullstack project using Azure Container Apps.
  */
-export type ProjectType = 'fullstack-aws'|'staticsite-aws';
-
+export type ProjectType = 'fullstack-aws'|'staticsite-aws'|'fullstack-azure';
 
 export type BaseProjectInputOptions = {
   projectName: string;
@@ -99,9 +100,8 @@ export type LimgenProject<TOpts = unknown> = {
 
 /**
  * An array containing all possible project types.
- * Currently, it includes only 'fullstack-aws'.
  */
-export const AllProjectTypes = ['fullstack-aws', 'staticsite-aws'] as const;
+export const AllProjectTypes = ['fullstack-aws', 'staticsite-aws', 'fullstack-azure'] as const;
 
 /**
  * Imports a project module dynamically based on the provided project type.
