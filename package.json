@@ -9,7 +9,7 @@
   "scripts": {
     "prepublish": "pnpm build",
     "dev": "tsx src/bin/index.ts",
-    "test": "rm -rf test/output && tsx --test --experimental-test-module-mocks  --experimental-test-coverage --test-coverage-exclude='test/**/*.ts' test/*.ts",
+    "test": "rm -rf test/output && tsx --test --experimental-test-module-mocks  --experimental-test-coverage  --test-coverage-lines=80 --test-coverage-branches=75 --test-coverage-functions=65 --test-coverage-exclude='test/**/*.ts' test/*.ts",
     "build": "scripts/build.sh",
     "update-examples": "scripts/update-examples.sh"
   },
