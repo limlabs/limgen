@@ -4,7 +4,7 @@
   "dependencies": {
     "@pulumi/aws": "^6.64.0",
     "@pulumi/awsx": "^2.19.0",
-    "@pulumi/pulumi": "^3.142.0",
-    "zod": "^3.23.8"
+    "@pulumi/pulumi": "^3.143.0",
+    "zod": "^3.24.1"
   }
 }
