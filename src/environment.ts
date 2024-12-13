@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import fs from 'fs/promises';
 import util from 'util';
+import { fileExists } from './files';
 
 export const usesEnvironmentVariable = async (envVarName: string) => {
   // do a text search in the source code for the environment variable
@@ -13,17 +14,14 @@ export const usesEnvironmentVariable = async (envVarName: string) => {
 
   const searchFiles = async (pattern: string, files: string[]) => {
     let excludeList: string[] = [];
-
-    try {
+    
+    if (await fileExists('.gitignore')) {
       const gitignoreContent = await fs.readFile('.gitignore', 'utf-8');
       const gitignorePatterns = gitignoreContent.split('\n')
         .filter(line => line?.trim() && !line.startsWith('#'))
         .map(line => line.trim());
       excludeList = gitignorePatterns;
-    } catch {
-      // If .gitignore doesn't exist or can't be read, proceed without excluding any files
     }
-
 
     try {
       const files = fs.glob(`**/*`);
