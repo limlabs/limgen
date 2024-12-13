@@ -13,6 +13,7 @@ export const initOptionsSchema = z.object({
   name: z.string().optional(),
   framework: z.string().optional(),
   projectType: z.enum(AllProjectTypes).optional(),
+  noScroll: z.boolean().optional(),
 });
 
 export const init = new Command()
@@ -23,6 +24,7 @@ export const init = new Command()
   .option('-n, --name <name>', 'Name of the project')
   .option('-t, --projectType <type>', 'Type of project to create')
   .option('-f, --framework <framework>', 'Framework to use')
+  .option('--noScroll', 'Disable scrolling output')
   .action(async (options) => {
     const cmdArgs = initOptionsSchema.parse(options);
 
@@ -58,9 +60,15 @@ export const init = new Command()
     }
 
     const cmdToRun = `(cd ${path.join('infrastructure', 'projects', projectInputs.projectName)} && pulumi up)`;
-    await animateTyping(`Project ${colorize('cyan', projectInputs.projectName)} initialized successfully!`);
-    await delay(500);
-    await animateTyping(`To deploy your resources, run ${bold(cmdToRun)}\n`);
+
+    if (cmdArgs.noScroll) {
+      console.log(`Project ${colorize('cyan', projectInputs.projectName)} initialized successfully!`);
+      console.log(`To deploy your resources, run ${bold(cmdToRun)}\n`);
+    } else {
+      await animateTyping(`Project ${colorize('cyan', projectInputs.projectName)} initialized successfully!`);
+      await delay(500);
+      await animateTyping(`To deploy your resources, run ${bold(cmdToRun)}\n`);
+    }
   });
 
 export async function getProjectType(cmdArgs: z.infer<typeof initOptionsSchema>) {

@@ -11,7 +11,8 @@ pnpm dev init \
   --includeStorage \
   --storageAccess=public \
   --includeDb \
-  --networkType=public
+  --networkType=public \
+  --noScroll
 
 echo "Updating nextjs-fullstack-aws-private..."
 rm -rf examples/nextjs-fullstack-aws-private/infrastructure
@@ -22,7 +23,8 @@ pnpm dev init \
   --storageAccess=public \
   --includeStorage \
   --includeDb \
-  --networkType=private
+  --networkType=private \
+  --noScroll
 
 echo "Updating nextjs-fullstack-aws-vanilla..."
 rm -rf examples/nextjs-fullstack-aws-vanilla/infrastructure examples/nextjs-fullstack-aws-vanilla/Dockerfile examples/nextjs-fullstack-aws-vanilla/.dockerignore
@@ -32,7 +34,8 @@ pnpm dev init \
   --name nextjs-vanilla \
   --includeStorage=false \
   --includeDb=false \
-  --networkType=public
+  --networkType=public \
+  --noScroll
 
 echo "Updating express-fullstack-aws-vanilla..."
 rm -rf examples/express-fullstack-aws-vanilla/infrastructure
@@ -43,7 +46,8 @@ pnpm dev init \
   --includeStorage=false \
   --includeDb=false \
   --networkType=public \
-  --port=9000 
+  --port=9000 \
+  --noScroll
 
 echo "Updating tanstack-fullstack-aws..."
 rm -rf examples/tanstack-fullstack-aws/infrastructure
@@ -53,11 +57,13 @@ pnpm dev init \
   --name tanstack-fullstack-aws \
   --includeStorage=false \
   --includeDb=false \
-  --networkType=public
+  --networkType=public \
+  --noScroll
 
 echo "Updating nextjs-staticsite-aws..."
 rm -rf examples/nextjs-staticsite-aws/infrastructure
 pnpm dev init \
   --directory examples/nextjs-staticsite-aws \
   --projectType staticsite-aws \
-  --name nextjs-staticsite-aws
+  --name nextjs-staticsite-aws \
+  --noScroll
