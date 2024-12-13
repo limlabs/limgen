@@ -55,9 +55,5 @@ export const usesEnvironmentVariable = async (envVarName: string) => {
   ];
 
   const found = await searchFiles(envVarName, filesToSearch);
-  if (found) {
-    return true;
-  }
-
-  return false;
+  return found;
 }
